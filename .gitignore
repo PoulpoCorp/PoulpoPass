@@ -1,3 +1,8 @@
-Java/.idea/*
-Java/*.iml
-Java/target/*
+Java/.idea/
+Java/Console/target/
+Java/App/target/
+Java/Core/target/
+
+*.iml
+*.ipr
+*.iws
