@@ -4,9 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>fr.PoulpoCorp</groupId>
-    <artifactId>PoulpoPass</artifactId>
+    <groupId>fr.poulpocorp</groupId>
+    <artifactId>poulpopass</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+
+    <modules>
+        <module>app</module>
+        <module>core</module>
+        <module>console</module>
+    </modules>
+
     <build>
         <plugins>
             <plugin>
@@ -20,5 +28,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
