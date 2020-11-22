@@ -1,5 +1,8 @@
 package fr.poulpocorp.poulpopass.console;
 
-public class Console {
+public class Main {
 
+    public static void main(String[] args) {
+
+    }
 }
