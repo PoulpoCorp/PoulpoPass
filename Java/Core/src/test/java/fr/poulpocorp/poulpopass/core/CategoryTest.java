@@ -105,10 +105,10 @@ public class CategoryTest {
     }
 
     /**
-     * Disassociate a category with a password
+     * Dissociate a category with a password
      */
     @Test
-    void disassociateWith1() {
+    void dissociateWith1() {
         Password password = new Password("pass", "word".toCharArray());
         Category category = new Category("category");
 
@@ -117,20 +117,20 @@ public class CategoryTest {
         assertEquals(1, category.size());
         assertEquals(1, password.getNumberOfCategories());
 
-        category.disassociateWith(password);
+        category.dissociateWith(password);
 
         assertEquals(0, category.size());
         assertEquals(0, password.getNumberOfCategories());
     }
 
     /**
-     * Disassociate a category with a password.
+     * Dissociate a category with a password.
      * The category is at first added to a password manager.
-     * This means that the disassociateWith method should <strong>not</strong>
+     * This means that the dissociateWith method should <strong>not</strong>
      * remove the password to the password manager
      */
     @Test
-    void disassociateWith2() {
+    void dissociateWith2() {
         PasswordManager manager = new PasswordManager();
 
         Password password = new Password("pass", "word".toCharArray());
@@ -144,7 +144,7 @@ public class CategoryTest {
         assertEquals(1, manager.getNumberOfPassword());
         assertEquals(1, manager.getNumberOfCategories());
 
-        category.disassociateWith(password);
+        category.dissociateWith(password);
         assertEquals(0, category.size());
         assertEquals(0, password.getNumberOfCategories());
         assertEquals(1, manager.getNumberOfPassword());
@@ -152,13 +152,13 @@ public class CategoryTest {
     }
 
     /**
-     * Disassociate a category with a password.
+     * Dissociate a category with a password.
      * The password is at first added to a password manager.
-     * This means that the disassociateWith method should <strong>not</strong>
+     * This means that the dissociateWith method should <strong>not</strong>
      * remove the password to the password manager
      */
     @Test
-    void disassociateWith3() {
+    void dissociateWith3() {
         PasswordManager manager = new PasswordManager();
 
         Password password = new Password("pass", "word".toCharArray());
@@ -172,7 +172,7 @@ public class CategoryTest {
         assertEquals(1, manager.getNumberOfPassword());
         assertEquals(1, manager.getNumberOfCategories());
 
-        category.disassociateWith(password);
+        category.dissociateWith(password);
         assertEquals(0, category.size());
         assertEquals(0, password.getNumberOfCategories());
         assertEquals(1, manager.getNumberOfPassword());
@@ -180,13 +180,13 @@ public class CategoryTest {
     }
 
     /**
-     * Disassociate a category with a password.
+     * Dissociate a category with a password.
      * The category and the password are at first added to a password manager.
-     * This means that the disassociateWith method should <strong>not</strong>
+     * This means that the dissociateWith method should <strong>not</strong>
      * remove the password to the password manager
      */
     @Test
-    void disassociateWith4() {
+    void dissociateWith4() {
         PasswordManager manager = new PasswordManager();
 
         Password password = new Password("pass", "word".toCharArray());
@@ -201,7 +201,7 @@ public class CategoryTest {
         assertEquals(1, manager.getNumberOfPassword());
         assertEquals(1, manager.getNumberOfCategories());
 
-        category.disassociateWith(password);
+        category.dissociateWith(password);
         assertEquals(0, category.size());
         assertEquals(0, password.getNumberOfCategories());
         assertEquals(1, manager.getNumberOfPassword());

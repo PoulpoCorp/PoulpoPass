@@ -119,7 +119,7 @@ public class PasswordManager implements IPasswordManager{
             password.passwordManager = null;
 
             for (Category category : password.getCategories()) {
-                category.disassociateWith(password);
+                category.dissociateWith(password);
             }
 
             return true;

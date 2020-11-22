@@ -30,7 +30,7 @@ public class Category {
         return false;
     }
 
-    public boolean disassociateWith(Password password) {
+    public boolean dissociateWith(Password password) {
         if (passwords.remove(password)) {
             password.dissociateWith(this);
 

@@ -38,7 +38,7 @@ public class Password {
 
     public boolean dissociateWith(Category category) {
         if (categories.remove(category)) {
-            category.disassociateWith(this);
+            category.dissociateWith(this);
 
             return true;
         }
