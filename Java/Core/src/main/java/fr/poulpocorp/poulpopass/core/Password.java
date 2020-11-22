@@ -21,10 +21,10 @@ public class Password {
         categories = new ArrayList<>();
     }
 
-    public boolean addCategory(Category category) {
-        if (!categories.contains(category)) { ;
+    public boolean associateWith(Category category) {
+        if (!categories.contains(category)) {
             categories.add(category);
-            category.addPassword(this);
+            category.associateWith(this);
 
             if (passwordManager != null) {
                 passwordManager.addCategory(category);
@@ -36,13 +36,9 @@ public class Password {
         return false;
     }
 
-    public boolean removeCategory(Category category) {
+    public boolean dissociateWith(Category category) {
         if (categories.remove(category)) {
-            category.removePassword(this);
-
-            if (passwordManager != null) {
-                passwordManager.removeCategory(category);
-            }
+            category.disassociateWith(this);
 
             return true;
         }
@@ -62,6 +58,10 @@ public class Password {
 
     public List<Category> getCategories() {
         return categories;
+    }
+
+    public int getNumberOfCategories() {
+        return categories.size();
     }
 
     public void addURL(String url) {

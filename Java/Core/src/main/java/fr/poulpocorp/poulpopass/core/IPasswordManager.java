@@ -16,6 +16,10 @@ public interface IPasswordManager {
 
     boolean removePassword(Password password);
 
+    int getNumberOfCategories();
+
+    int getNumberOfPassword();
+
     char[] getMasterPassword();
 
     void setMasterPassword(char[] masterPassword);

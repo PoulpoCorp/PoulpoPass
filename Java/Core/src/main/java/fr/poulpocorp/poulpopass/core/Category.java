@@ -15,10 +15,10 @@ public class Category {
         passwords = new ArrayList<>();
     }
 
-    public boolean addPassword(Password password) {
+    public boolean associateWith(Password password) {
         if (!passwords.contains(password)) {
             passwords.add(password);
-            password.addCategory(this);
+            password.associateWith(this);
 
             if (passwordManager != null) {
                 passwordManager.addPassword(password);
@@ -30,13 +30,9 @@ public class Category {
         return false;
     }
 
-    public boolean removePassword(Password password) {
+    public boolean disassociateWith(Password password) {
         if (passwords.remove(password)) {
-            password.removeCategory(this);
-
-            if (passwordManager != null) {
-                passwordManager.removePassword(password);
-            }
+            password.dissociateWith(this);
 
             return true;
         }
@@ -56,6 +52,10 @@ public class Category {
 
     public List<Password> getPasswords() {
         return passwords;
+    }
+
+    public int size() {
+        return passwords.size();
     }
 
     public String getName() {

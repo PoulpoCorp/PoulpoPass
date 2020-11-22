@@ -57,8 +57,9 @@ public class PasswordManager implements IPasswordManager{
         if (!categories.contains(category)) {
             if (category.passwordManager != null) {
                 category.passwordManager.removeCategory(category);
-                category.passwordManager = this;
             }
+
+            category.passwordManager = this;
 
             categories.add(category);
 
@@ -80,7 +81,7 @@ public class PasswordManager implements IPasswordManager{
             category.passwordManager = null;
 
             for (Password password : category.getPasswords()) {
-                password.removeCategory(category);
+                password.dissociateWith(category);
             }
 
             return true;
@@ -94,8 +95,9 @@ public class PasswordManager implements IPasswordManager{
         if (!passwords.contains(password)) {
             if (password.passwordManager != null) {
                 password.passwordManager.removePassword(password);
-                password.passwordManager = this;
             }
+
+            password.passwordManager = this;
 
             passwords.add(password);
 
@@ -117,13 +119,23 @@ public class PasswordManager implements IPasswordManager{
             password.passwordManager = null;
 
             for (Category category : password.getCategories()) {
-                category.removePassword(password);
+                category.disassociateWith(password);
             }
 
             return true;
         }
 
         return false;
+    }
+
+    @Override
+    public int getNumberOfCategories() {
+        return categories.size();
+    }
+
+    @Override
+    public int getNumberOfPassword() {
+        return passwords.size();
     }
 
     @Override
