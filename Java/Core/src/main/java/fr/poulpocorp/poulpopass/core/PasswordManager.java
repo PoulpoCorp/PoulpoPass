@@ -80,8 +80,13 @@ public class PasswordManager implements IPasswordManager{
         if (categories.remove(category)) {
             category.passwordManager = null;
 
-            for (Password password : category.getPasswords()) {
-                password.dissociateWith(category);
+            List<Password> passwords = category.getPasswords();
+            for (int i = 0; i < passwords.size(); i++) {
+                Password password = passwords.get(i);
+
+                if (password.dissociateWith(category)) {
+                    i--;
+                }
             }
 
             return true;
@@ -118,8 +123,13 @@ public class PasswordManager implements IPasswordManager{
         if (passwords.remove(password)) {
             password.passwordManager = null;
 
-            for (Category category : password.getCategories()) {
-                category.dissociateWith(password);
+            List<Category> categories = password.getCategories();
+            for (int i = 0; i < categories.size(); i++) {
+                Category category = categories.get(i);
+
+                if (category.dissociateWith(password)) {
+                    i--;
+                }
             }
 
             return true;
@@ -134,7 +144,7 @@ public class PasswordManager implements IPasswordManager{
     }
 
     @Override
-    public int getNumberOfPassword() {
+    public int getNumberOfPasswords() {
         return passwords.size();
     }
 

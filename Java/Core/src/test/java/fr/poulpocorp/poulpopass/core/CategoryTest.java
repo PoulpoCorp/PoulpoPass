@@ -39,13 +39,13 @@ public class CategoryTest {
 
         assertEquals(0, category.size());
         assertEquals(0, password.getNumberOfCategories());
-        assertEquals(0, manager.getNumberOfPassword());
+        assertEquals(0, manager.getNumberOfPasswords());
         assertEquals(1, manager.getNumberOfCategories());
 
         category.associateWith(password);
         assertEquals(1, category.size());
         assertEquals(1, password.getNumberOfCategories());
-        assertEquals(1, manager.getNumberOfPassword());
+        assertEquals(1, manager.getNumberOfPasswords());
         assertEquals(1, manager.getNumberOfCategories());
     }
 
@@ -66,13 +66,13 @@ public class CategoryTest {
 
         assertEquals(0, category.size());
         assertEquals(0, password.getNumberOfCategories());
-        assertEquals(1, manager.getNumberOfPassword());
+        assertEquals(1, manager.getNumberOfPasswords());
         assertEquals(0, manager.getNumberOfCategories());
 
         category.associateWith(password);
         assertEquals(1, category.size());
         assertEquals(1, password.getNumberOfCategories());
-        assertEquals(1, manager.getNumberOfPassword());
+        assertEquals(1, manager.getNumberOfPasswords());
         assertEquals(1, manager.getNumberOfCategories());
     }
 
@@ -94,13 +94,13 @@ public class CategoryTest {
 
         assertEquals(0, category.size());
         assertEquals(0, password.getNumberOfCategories());
-        assertEquals(1, manager.getNumberOfPassword());
+        assertEquals(1, manager.getNumberOfPasswords());
         assertEquals(1, manager.getNumberOfCategories());
 
         category.associateWith(password);
         assertEquals(1, category.size());
         assertEquals(1, password.getNumberOfCategories());
-        assertEquals(1, manager.getNumberOfPassword());
+        assertEquals(1, manager.getNumberOfPasswords());
         assertEquals(1, manager.getNumberOfCategories());
     }
 
@@ -141,13 +141,13 @@ public class CategoryTest {
 
         assertEquals(1, category.size());
         assertEquals(1, password.getNumberOfCategories());
-        assertEquals(1, manager.getNumberOfPassword());
+        assertEquals(1, manager.getNumberOfPasswords());
         assertEquals(1, manager.getNumberOfCategories());
 
         category.dissociateWith(password);
         assertEquals(0, category.size());
         assertEquals(0, password.getNumberOfCategories());
-        assertEquals(1, manager.getNumberOfPassword());
+        assertEquals(1, manager.getNumberOfPasswords());
         assertEquals(1, manager.getNumberOfCategories());
     }
 
@@ -169,13 +169,13 @@ public class CategoryTest {
 
         assertEquals(1, category.size());
         assertEquals(1, password.getNumberOfCategories());
-        assertEquals(1, manager.getNumberOfPassword());
+        assertEquals(1, manager.getNumberOfPasswords());
         assertEquals(1, manager.getNumberOfCategories());
 
         category.dissociateWith(password);
         assertEquals(0, category.size());
         assertEquals(0, password.getNumberOfCategories());
-        assertEquals(1, manager.getNumberOfPassword());
+        assertEquals(1, manager.getNumberOfPasswords());
         assertEquals(1, manager.getNumberOfCategories());
     }
 
@@ -198,13 +198,13 @@ public class CategoryTest {
 
         assertEquals(1, category.size());
         assertEquals(1, password.getNumberOfCategories());
-        assertEquals(1, manager.getNumberOfPassword());
+        assertEquals(1, manager.getNumberOfPasswords());
         assertEquals(1, manager.getNumberOfCategories());
 
         category.dissociateWith(password);
         assertEquals(0, category.size());
         assertEquals(0, password.getNumberOfCategories());
-        assertEquals(1, manager.getNumberOfPassword());
+        assertEquals(1, manager.getNumberOfPasswords());
         assertEquals(1, manager.getNumberOfCategories());
     }
 }

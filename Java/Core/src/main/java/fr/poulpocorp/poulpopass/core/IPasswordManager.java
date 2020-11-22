@@ -18,7 +18,7 @@ public interface IPasswordManager {
 
     int getNumberOfCategories();
 
-    int getNumberOfPassword();
+    int getNumberOfPasswords();
 
     char[] getMasterPassword();
 
