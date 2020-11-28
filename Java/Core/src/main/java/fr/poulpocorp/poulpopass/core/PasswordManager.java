@@ -1,6 +1,5 @@
 package fr.poulpocorp.poulpopass.core;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,111 +30,11 @@ public class PasswordManager implements IPasswordManager{
 
     private final List<Password> passwords;
     private final List<Category> categories;
-
-    private Path file;
     private char[] masterPassword;
-
-    private boolean open = false;
 
     public PasswordManager() {
         passwords = new ArrayList<>();
         categories = new ArrayList<>();
-    }
-
-    @Override
-    public void open(Path file, char[] password) throws PasswordManagerException {
-
-    }
-
-    @Override
-    public void open(Path file, char[] password, boolean closeIfOpen) throws PasswordManagerException {
-
-    }
-
-    @Override
-    public boolean addCategory(Category category) {
-        if (!categories.contains(category)) {
-            if (category.passwordManager != null) {
-                category.passwordManager.removeCategory(category);
-            }
-
-            category.passwordManager = this;
-
-            categories.add(category);
-
-            List<Password> passwords = category.getPasswords();
-
-            for (Password password : passwords) {
-                addPassword(password);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean removeCategory(Category category) {
-        if (categories.remove(category)) {
-            category.passwordManager = null;
-
-            List<Password> passwords = category.getPasswords();
-            for (int i = 0; i < passwords.size(); i++) {
-                Password password = passwords.get(i);
-
-                if (password.dissociateWith(category)) {
-                    i--;
-                }
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean addPassword(Password password) {
-        if (!passwords.contains(password)) {
-            if (password.passwordManager != null) {
-                password.passwordManager.removePassword(password);
-            }
-
-            password.passwordManager = this;
-
-            passwords.add(password);
-
-            List<Category> categories = password.getCategories();
-
-            for (Category category : categories) {
-                addCategory(category);
-            }
-
-            return true;
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean removePassword(Password password) {
-        if (passwords.remove(password)) {
-            password.passwordManager = null;
-
-            List<Category> categories = password.getCategories();
-            for (int i = 0; i < categories.size(); i++) {
-                Category category = categories.get(i);
-
-                if (category.dissociateWith(password)) {
-                    i--;
-                }
-            }
-
-            return true;
-        }
-
-        return false;
     }
 
     @Override
@@ -156,20 +55,5 @@ public class PasswordManager implements IPasswordManager{
     @Override
     public void setMasterPassword(char[] masterPassword) {
         this.masterPassword = masterPassword;
-    }
-
-    @Override
-    public void close() throws PasswordManagerException {
-
-    }
-
-    @Override
-    public void close(Path out) throws PasswordManagerException {
-
-    }
-
-    @Override
-    public boolean isOpen() {
-        return false;
     }
 }

@@ -16,27 +16,10 @@ public class Category {
     }
 
     public boolean associateWith(Password password) {
-        if (!passwords.contains(password)) {
-            passwords.add(password);
-            password.associateWith(this);
-
-            if (passwordManager != null) {
-                passwordManager.addPassword(password);
-            }
-
-            return true;
-        }
-
         return false;
     }
 
     public boolean dissociateWith(Password password) {
-        if (passwords.remove(password)) {
-            password.dissociateWith(this);
-
-            return true;
-        }
-
         return false;
     }
 

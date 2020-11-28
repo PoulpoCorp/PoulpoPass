@@ -22,27 +22,10 @@ public class Password {
     }
 
     public boolean associateWith(Category category) {
-        if (!categories.contains(category)) {
-            categories.add(category);
-            category.associateWith(this);
-
-            if (passwordManager != null) {
-                passwordManager.addCategory(category);
-            }
-
-            return true;
-        }
-
         return false;
     }
 
     public boolean dissociateWith(Category category) {
-        if (categories.remove(category)) {
-            category.dissociateWith(this);
-
-            return true;
-        }
-
         return false;
     }
 
