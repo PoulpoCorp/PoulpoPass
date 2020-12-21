@@ -10,7 +10,7 @@ public class Category {
     private String name;
     private List<Password> passwords;
 
-    public Category(String name) {
+    Category(String name) {
         this.name = name;
         passwords = new ArrayList<>();
     }
