@@ -41,6 +41,56 @@ public class PasswordManager implements IPasswordManager {
         return new PasswordManager(path, masterPassword, null, null);
     }
 
+    private static int idxToNewLine(byte[] str, int from) {
+        var idx = from;
+        for (; idx < str.length && str[idx] != '\n'; idx++);
+        return idx;
+    }
+
+    private static int idxToNewLine(byte[] str) {
+        return idxToNewLine(str, 0);
+    }
+
+    private static int bytesToInt(byte[] str, int from, int to) throws Exception {
+        int return_v = 0;
+        for (; from < to; from++) {
+            return_v *= 10;
+            if (str[from] < '0' || str[from] > '9') {
+                throw new Exception("not a number");
+            }
+            return_v += Byte.toUnsignedInt(str[from]);
+        }
+        return return_v;
+    }
+
+    /**
+     * Ajoute les catégories au tableau this.categories.
+     *
+     * @param file  : le fichier déchiffré.
+     * @param from  : index de début pour lire le tableau de byte (file)
+     * @return renvoie le nouveau <i>from</i>.
+     *
+     * tips: idxToNewLine(byte[], int from) te renvoie l'index du prochain '\n' après from dans le tableau de byte.
+     */
+    private int parseCategories(byte[] file, int from) {
+        // TODO: Valent
+        return 0;
+    }
+
+    private void initAfterDecrypt(byte[] decryptedFile) {
+        int idxStart = 0, idxEnd = idxToNewLine(decryptedFile);
+        int catNumber = 0;
+        try {
+            catNumber = bytesToInt(decryptedFile, idxStart, idxStart);
+        } catch (Exception e) {
+            // TODO expected the number of categories
+        }
+        categories = new ArrayList<>(catNumber);
+        idxStart = idxEnd + 1;
+        idxStart = parseCategories(decryptedFile, idxStart);
+        idxEnd = idxToNewLine(decryptedFile, idxStart);
+    }
+
     private Path path;
     private char[] masterPassword;
 
