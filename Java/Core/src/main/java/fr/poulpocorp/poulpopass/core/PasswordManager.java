@@ -54,11 +54,19 @@ public class PasswordManager implements IPasswordManager {
     private static int bytesToInt(byte[] str, int from, int to) throws Exception {
         int return_v = 0;
         for (; from < to; from++) {
-            return_v *= 10;
-            if (str[from] < '0' || str[from] > '9') {
-                throw new Exception("not a number");
-            }
-            return_v += Byte.toUnsignedInt(str[from]);
+            return_v = return_v << 8;
+            return_v |= str[from];
+        }
+        if (return_v < 0) {
+            throw new Exception("the value must be > 0");
+        }
+        return return_v;
+    }
+
+    private static String bytesToString(byte[] str, int from, int len) {
+        var return_v = "";
+        for (; from < len; from++) {
+            return_v += Byte.toString(str[from]);
         }
         return return_v;
     }
@@ -77,18 +85,41 @@ public class PasswordManager implements IPasswordManager {
         return 0;
     }
 
+    private int parsePasswords(byte[] file, int from) {
+        int end = from + 4;
+        int nameLen = 0;
+        try {
+            nameLen = bytesToInt(file, from, end);
+            from = end;
+        } catch (Exception e) {
+            // TODO: expected a number with 4 bytes (0 0 0 0 to 9 9 9 9)
+        }
+        String name = bytesToString(file, from, nameLen);
+        from = nameLen;
+        int passwordLen = 0;
+        try {
+            passwordLen = bytesToInt(file, from, from + 4);
+            from = from + 4;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String password = bytesToString(file, from, passwordLen);
+
+        return from;
+    }
+
     private void initAfterDecrypt(byte[] decryptedFile) {
-        int idxStart = 0, idxEnd = idxToNewLine(decryptedFile);
+        int idxStart = 0, idxEnd = idxStart + 4;
         int catNumber = 0;
         try {
-            catNumber = bytesToInt(decryptedFile, idxStart, idxStart);
+            catNumber = bytesToInt(decryptedFile, idxStart, idxEnd);
         } catch (Exception e) {
             // TODO expected the number of categories
         }
         categories = new ArrayList<>(catNumber);
-        idxStart = idxEnd + 1;
+        idxStart = idxEnd;
         idxStart = parseCategories(decryptedFile, idxStart);
-        idxEnd = idxToNewLine(decryptedFile, idxStart);
+
     }
 
     private Path path;
