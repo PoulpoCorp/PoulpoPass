@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * File format
@@ -33,34 +34,52 @@ import java.util.List;
  */
 public class PasswordManager implements IPasswordManager {
 
-    public static PasswordManager newPasswordManager(Path path, char[] masterPassword) throws IOException, InvalidKeyException {
+    public static PasswordManager newPasswordManager(Path path, char[] masterPassword) throws IOException, InvalidKeyException, ParseException {
         byte[] data = CryptoUtils.decrypt(Files.readAllBytes(path), masterPassword);
 
-        // parse
-
-        return new PasswordManager(path, masterPassword, null, null);
+        return new PasswordManager(data, path, masterPassword);
     }
 
-    private static int idxToNewLine(byte[] str, int from) {
-        var idx = from;
-        for (; idx < str.length && str[idx] != '\n'; idx++);
-        return idx;
+    private Path path;
+    private char[] masterPassword;
+
+    private Vector<Password> passwords;
+    private Vector<Category> categories;
+
+    public PasswordManager(char[] masterPassword) {
+        this.masterPassword = masterPassword;
+
+        path = null;
+        passwords = new Vector<>();
+        categories = new Vector<>();
     }
 
-    private static int idxToNewLine(byte[] str) {
-        return idxToNewLine(str, 0);
+    protected PasswordManager(byte[] decryptedFile, Path path, char[] masterPassword) throws ParseException {
+        this.path = path;
+        this.masterPassword = masterPassword;
+
+        initAfterDecrypt(decryptedFile);
     }
 
-    private static int bytesToInt(byte[] str, int from, int to) throws Exception {
+    private int bytesToInt(byte[] str, int from, int to) {
         int return_v = 0;
         for (; from < to; from++) {
             return_v *= 10;
             if (str[from] < '0' || str[from] > '9') {
-                throw new Exception("not a number");
+                //throw new Exception("not a number");
             }
             return_v += Byte.toUnsignedInt(str[from]);
         }
         return return_v;
+    }
+
+    private void initAfterDecrypt(byte[] decryptedFile) throws ParseException {
+        int idxStart = 0;
+
+        int catNumber = bytesToInt(decryptedFile, idxStart, idxStart += Integer.BYTES);
+
+        categories = new Vector<>(catNumber);
+        idxStart = parseCategories(decryptedFile, idxStart, catNumber);
     }
 
     /**
@@ -69,47 +88,19 @@ public class PasswordManager implements IPasswordManager {
      * @param file  : le fichier déchiffré.
      * @param from  : index de début pour lire le tableau de byte (file)
      * @return renvoie le nouveau <i>from</i>.
-     *
-     * tips: idxToNewLine(byte[], int from) te renvoie l'index du prochain '\n' après from dans le tableau de byte.
      */
-    private int parseCategories(byte[] file, int from) {
-        // TODO: Valent
-        return 0;
-    }
+    private int parseCategories(byte[] file, int from, int n) {
+        for (int i = 0; i < n; i++) {
+            int nameLength = bytesToInt(file, from, from += 4);
 
-    private void initAfterDecrypt(byte[] decryptedFile) {
-        int idxStart = 0, idxEnd = idxToNewLine(decryptedFile);
-        int catNumber = 0;
-        try {
-            catNumber = bytesToInt(decryptedFile, idxStart, idxStart);
-        } catch (Exception e) {
-            // TODO expected the number of categories
+            String name = new String(file, from, nameLength);
+
+            categories.add(new Category(name));
+
+            from += nameLength;
         }
-        categories = new ArrayList<>(catNumber);
-        idxStart = idxEnd + 1;
-        idxStart = parseCategories(decryptedFile, idxStart);
-        idxEnd = idxToNewLine(decryptedFile, idxStart);
-    }
 
-    private Path path;
-    private char[] masterPassword;
-
-    private List<Password> passwords;
-    private List<Category> categories;
-
-    public PasswordManager(char[] masterPassword) {
-        this.masterPassword = masterPassword;
-
-        path = null;
-        passwords = new ArrayList<>();
-        categories = new ArrayList<>();
-    }
-
-    protected PasswordManager(Path path, char[] masterPassword, List<Password> passwords, List<Category> categories) {
-        this.path = path;
-        this.masterPassword = masterPassword;
-        this.passwords = passwords;
-        this.categories = categories;
+        return from;
     }
 
     public Category getOrCreate(String name) {
@@ -145,5 +136,13 @@ public class PasswordManager implements IPasswordManager {
         if (masterPassword != null) {
             this.masterPassword = masterPassword;
         }
+    }
+
+    public Path getPath() {
+        return path;
+    }
+
+    public void setPath(Path path) {
+        this.path = path;
     }
 }
