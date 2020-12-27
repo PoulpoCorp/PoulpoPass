@@ -178,20 +178,54 @@ public class PasswordManager implements IPasswordManager {
             throw new NullPointerException("path is null");
         }
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
         try {
-            writeCategories(baos);
+            writeCategories(os);
+
+            writeInteger(os, passwords.size());
+
+            for (Password password : passwords) {
+                writePassword(os, password);
+            }
+
         } catch (IOException ignored) {} // ByteArrayOutputStream never throws IOException
     }
 
     protected void writeCategories(ByteArrayOutputStream os) throws IOException {
-        os.write(categories.size());
+        writeInteger(os, categories.size());
 
         for (Category category : categories) {
-            String name = category.getName();
-
-            os.write(name.getBytes());
+            writeString(os, category.getName());
         }
+    }
+
+    protected void writePassword(ByteArrayOutputStream os, Password password) throws IOException {
+        writeString(os, password.getName());
+        writeString(os, String.valueOf(password.getPassword()));
+
+        String[] urls = password.getURLs();
+
+        writeInteger(os, urls.length);
+        for (String url : urls) {
+            writeString(os, url);
+        }
+
+        List<Category> categories = password.getCategories();
+        for (Category category : categories) {
+            writeInteger(os, this.categories.indexOf(category));
+        }
+    }
+
+    protected void writeString(ByteArrayOutputStream os, String str) throws IOException {
+        writeInteger(os, str.length());
+        os.write(str.getBytes());
+    }
+
+    protected void writeInteger(ByteArrayOutputStream os, int value) {
+        os.write((value >> 24) & 0xFF);
+        os.write((value >> 16) & 0xFF);
+        os.write((value >>  8) & 0xFF);
+        os.write( value        & 0xFF);
     }
 
     public Category getOrCreate(String name) {
