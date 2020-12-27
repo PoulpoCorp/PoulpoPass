@@ -102,12 +102,10 @@ public class PasswordManager implements IPasswordManager {
     private int parsePasswords(byte[] file, int from) throws ParseException {
         int i = 0;
         int nameLen = 0;
-        try {
-            nameLen = bytesToInt(file, from, from + Integer.BYTES);
-            from += Integer.BYTES;
-        } catch (Exception e) {
-            // TODO: expected a number with 4 bytes (0 0 0 0 to 9 9 9 9)
-        }
+
+        nameLen = bytesToInt(file, from, from + Integer.BYTES);
+        from += Integer.BYTES;
+
         String name = bytesToString(file, from, nameLen);
         from += nameLen;
         int passwordLen = 0;
