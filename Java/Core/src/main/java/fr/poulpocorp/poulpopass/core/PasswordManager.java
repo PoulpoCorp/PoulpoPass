@@ -85,26 +85,32 @@ public class PasswordManager implements IPasswordManager {
         return 0;
     }
 
+    private int parseURLS(byte[] file, int from, int idxPwd) {
+        return 0;
+    }
+
     private int parsePasswords(byte[] file, int from) {
-        int end = from + 4;
+        int i = 0;
         int nameLen = 0;
         try {
-            nameLen = bytesToInt(file, from, end);
-            from = end;
+            nameLen = bytesToInt(file, from, from + Integer.BYTES);
+            from += Integer.BYTES;
         } catch (Exception e) {
             // TODO: expected a number with 4 bytes (0 0 0 0 to 9 9 9 9)
         }
         String name = bytesToString(file, from, nameLen);
-        from = nameLen;
+        from += nameLen;
         int passwordLen = 0;
         try {
             passwordLen = bytesToInt(file, from, from + 4);
-            from = from + 4;
+            from += 4;
         } catch (Exception e) {
             e.printStackTrace();
         }
         String password = bytesToString(file, from, passwordLen);
-
+        from += passwordLen;
+        passwords.set(i, new Password(name, password.toCharArray()));
+        from = parseURLS(file, from, i);
         return from;
     }
 
