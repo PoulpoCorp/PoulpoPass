@@ -99,24 +99,35 @@ public class PasswordManager implements IPasswordManager {
         return from;
     }
 
-    private int parsePasswords(byte[] file, int from) throws ParseException {
-        int i = 0;
-        int nameLen = 0;
-
-        nameLen = bytesToInt(file, from, from + Integer.BYTES);
+    private int linkCategories(byte[] file, int from, int idxPwd) throws ParseException {
+        int nbCat = bytesToInt(file, from, from + Integer.BYTES);
         from += Integer.BYTES;
 
-        String name = bytesToString(file, from, nameLen);
-        from += nameLen;
-        int passwordLen = 0;
+        for (var i = 0; i < nbCat; i++) {
+            passwords.get(idxPwd).associateWith(categories.get(bytesToInt(file, from, from + Integer.BYTES)));
+            from += Integer.BYTES;
+        }
+        return from;
+    }
 
-        passwordLen = bytesToInt(file, from, from + 4);
-        from += 4;
+    private int parsePasswords(byte[] file, int from) throws ParseException {
+        for (var i = 0; i < passwords.capacity(); i++) {
+            int nameLen = bytesToInt(file, from, from + Integer.BYTES);
+            from += Integer.BYTES;
 
-        String password = bytesToString(file, from, passwordLen);
-        from += passwordLen;
-        passwords.set(i, new Password(name, password.toCharArray()));
-        from = parseURLS(file, from, i);
+            String name = bytesToString(file, from, nameLen);
+            from += nameLen;
+
+            int passwordLen = bytesToInt(file, from, from + 4);
+            from += 4;
+
+            String password = bytesToString(file, from, passwordLen);
+            from += passwordLen;
+
+            passwords.set(i, new Password(name, password.toCharArray()));
+            from = parseURLS(file, from, i);
+            from = linkCategories(file, from, i);
+        }
         return from;
     }
 
@@ -131,7 +142,7 @@ public class PasswordManager implements IPasswordManager {
         categories = new Vector<>(catNumber);
         idxStart = idxEnd;
         idxStart = parseCategories(decryptedFile, idxStart);
-
+        idxStart = parsePasswords(decryptedFile, idxStart);
     }
 
     /**
