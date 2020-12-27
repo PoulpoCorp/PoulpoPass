@@ -1,8 +1,12 @@
 package fr.poulpocorp.poulpopass.core;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.InvalidKeyException;
@@ -167,6 +171,27 @@ public class PasswordManager implements IPasswordManager {
         }
 
         return from;
+    }
+
+    public void save() {
+        if (path == null) {
+            throw new NullPointerException("path is null");
+        }
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            writeCategories(baos);
+        } catch (IOException ignored) {} // ByteArrayOutputStream never throws IOException
+    }
+
+    protected void writeCategories(ByteArrayOutputStream os) throws IOException {
+        os.write(categories.size());
+
+        for (Category category : categories) {
+            String name = category.getName();
+
+            os.write(name.getBytes());
+        }
     }
 
     public Category getOrCreate(String name) {
