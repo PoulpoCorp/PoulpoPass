@@ -61,25 +61,63 @@ public class PasswordManager implements IPasswordManager {
         initAfterDecrypt(decryptedFile);
     }
 
-    private int bytesToInt(byte[] str, int from, int to) {
+    private int bytesToInt(byte[] str, int from, int to) throws ParseException {
         int return_v = 0;
         for (; from < to; from++) {
-            return_v *= 10;
-            if (str[from] < '0' || str[from] > '9') {
-                //throw new Exception("not a number");
-            }
-            return_v += Byte.toUnsignedInt(str[from]);
+            return_v = return_v << 8;
+            return_v |= str[from];
+        }
+        if (return_v < 0) {
+            throw new ParseException("the value must be > 0");
         }
         return return_v;
     }
 
+    private static String bytesToString(byte[] str, int from, int len) {
+        return new String(str, from, len);
+    }
+
+    private int parseURLS(byte[] file, int from, int idxPwd) {
+        return 0;
+    }
+
+    private int parsePasswords(byte[] file, int from) {
+        int i = 0;
+        int nameLen = 0;
+        try {
+            nameLen = bytesToInt(file, from, from + Integer.BYTES);
+            from += Integer.BYTES;
+        } catch (Exception e) {
+            // TODO: expected a number with 4 bytes (0 0 0 0 to 9 9 9 9)
+        }
+        String name = bytesToString(file, from, nameLen);
+        from += nameLen;
+        int passwordLen = 0;
+        try {
+            passwordLen = bytesToInt(file, from, from + 4);
+            from += 4;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String password = bytesToString(file, from, passwordLen);
+        from += passwordLen;
+        passwords.set(i, new Password(name, password.toCharArray()));
+        from = parseURLS(file, from, i);
+        return from;
+    }
+
     private void initAfterDecrypt(byte[] decryptedFile) throws ParseException {
-        int idxStart = 0;
-
-        int catNumber = bytesToInt(decryptedFile, idxStart, idxStart += Integer.BYTES);
-
+        int idxStart = 0, idxEnd = idxStart + 4;
+        int catNumber = 0;
+        try {
+            catNumber = bytesToInt(decryptedFile, idxStart, idxEnd);
+        } catch (Exception e) {
+            // TODO expected the number of categories
+        }
         categories = new Vector<>(catNumber);
-        idxStart = parseCategories(decryptedFile, idxStart, catNumber);
+        idxStart = idxEnd;
+        idxStart = parseCategories(decryptedFile, idxStart);
+
     }
 
     /**
@@ -89,9 +127,11 @@ public class PasswordManager implements IPasswordManager {
      * @param from  : index de début pour lire le tableau de byte (file)
      * @return renvoie le nouveau <i>from</i>.
      */
-    private int parseCategories(byte[] file, int from, int n) {
+    private int parseCategories(byte[] file, int from) throws ParseException {
+        int n = categories.capacity();
+
         for (int i = 0; i < n; i++) {
-            int nameLength = bytesToInt(file, from, from += 4);
+            int nameLength = bytesToInt(file, from, from += Integer.BYTES);
 
             String name = new String(file, from, nameLength);
 
