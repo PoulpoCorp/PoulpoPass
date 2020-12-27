@@ -1,14 +1,12 @@
 package fr.poulpocorp.poulpopass.core;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
@@ -173,9 +171,13 @@ public class PasswordManager implements IPasswordManager {
         return from;
     }
 
-    public void save() {
-        if (path == null) {
+    public void save() throws IOException, InvalidKeyException {
+        if (path == null || masterPassword == null) {
             throw new NullPointerException("path is null");
+        }
+
+        if (masterPassword.length == 0) {
+            throw new IllegalStateException("Master password is too short");
         }
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -189,6 +191,14 @@ public class PasswordManager implements IPasswordManager {
             }
 
         } catch (IOException ignored) {} // ByteArrayOutputStream never throws IOException
+
+        byte[] encryptedData = CryptoUtils.encrypt(os.toByteArray(), masterPassword);
+
+        if (Files.notExists(path.getParent())) {
+            Files.createDirectories(path.getParent());
+        }
+
+        Files.write(path, encryptedData, StandardOpenOption.CREATE);
     }
 
     protected void writeCategories(ByteArrayOutputStream os) throws IOException {
