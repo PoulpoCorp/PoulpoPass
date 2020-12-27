@@ -1,6 +1,8 @@
 package fr.poulpocorp.poulpopass.core;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.InvalidKeyException;
@@ -77,11 +79,27 @@ public class PasswordManager implements IPasswordManager {
         return new String(str, from, len);
     }
 
-    private int parseURLS(byte[] file, int from, int idxPwd) {
-        return 0;
+    private int parseURLS(byte[] file, int from, int idxPwd) throws ParseException {
+        Password password = passwords.get(idxPwd);
+
+        int n = bytesToInt(file, from, from + 4);
+        from += 4;
+
+        for (int i = 0; i < n; i++) {
+            int urlLength = bytesToInt(file, from, from + 4);
+            from += 4;
+
+            String url = new String(file, from, urlLength);
+
+            password.addURL(url);
+
+            from += urlLength;
+        }
+
+        return from;
     }
 
-    private int parsePasswords(byte[] file, int from) {
+    private int parsePasswords(byte[] file, int from) throws ParseException {
         int i = 0;
         int nameLen = 0;
         try {
@@ -93,12 +111,10 @@ public class PasswordManager implements IPasswordManager {
         String name = bytesToString(file, from, nameLen);
         from += nameLen;
         int passwordLen = 0;
-        try {
-            passwordLen = bytesToInt(file, from, from + 4);
-            from += 4;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        passwordLen = bytesToInt(file, from, from + 4);
+        from += 4;
+
         String password = bytesToString(file, from, passwordLen);
         from += passwordLen;
         passwords.set(i, new Password(name, password.toCharArray()));
@@ -131,7 +147,8 @@ public class PasswordManager implements IPasswordManager {
         int n = categories.capacity();
 
         for (int i = 0; i < n; i++) {
-            int nameLength = bytesToInt(file, from, from += Integer.BYTES);
+            int nameLength = bytesToInt(file, from, from + Integer.BYTES);
+            from += Integer.BYTES;
 
             String name = new String(file, from, nameLength);
 
