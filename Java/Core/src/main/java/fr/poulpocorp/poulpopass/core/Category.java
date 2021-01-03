@@ -1,26 +1,36 @@
 package fr.poulpocorp.poulpopass.core;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
-public class Category {
+public class Category extends PasswordManagerElement {
 
-    IPasswordManager passwordManager;
-
-    private String name;
-    private List<Password> passwords;
+    private Set<Password> passwords;
 
     Category(String name) {
-        this.name = name;
-        passwords = new ArrayList<>();
+        super(name);
+        passwords = new HashSet<>();
     }
 
     public boolean associateWith(Password password) {
-        return false;
+        password.notifyAssociation(this);
+
+        return passwords.add(password);
+    }
+
+    void notifyAssociation(Password password) {
+        passwords.add(password);
     }
 
     public boolean dissociateWith(Password password) {
-        return false;
+        password.notifyDissociation(this);
+
+        return passwords.remove(password);
+    }
+
+    void notifyDissociation(Password password) {
+        passwords.remove(password);
     }
 
     public Password getPasswordByName(String name) {
@@ -33,8 +43,8 @@ public class Category {
         return null;
     }
 
-    public List<Password> getPasswords() {
-        return passwords;
+    public Set<Password> getPasswords() {
+        return Collections.unmodifiableSet(passwords);
     }
 
     public int size() {

@@ -1,16 +1,16 @@
 package fr.poulpocorp.poulpopass.core;
 
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.security.InvalidKeyException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 /**
  * File format
@@ -220,7 +220,7 @@ public class PasswordManager implements IPasswordManager {
             writeString(os, url);
         }
 
-        List<Category> categories = password.getCategories();
+        Set<Category> categories = password.getCategories();
         for (Category category : categories) {
             writeInteger(os, this.categories.indexOf(category));
         }
@@ -238,7 +238,8 @@ public class PasswordManager implements IPasswordManager {
         os.write( value        & 0xFF);
     }
 
-    public Category getOrCreate(String name) {
+    @Override
+    public Category getOrCreateCategory(String name) {
         for (Category c : categories) {
             if (c.getName().equals(name)) {
                 return c;
@@ -246,6 +247,8 @@ public class PasswordManager implements IPasswordManager {
         }
 
         Category category = new Category(name);
+        category.passwordManager = this;
+
         categories.add(category);
 
         return category;
@@ -257,8 +260,34 @@ public class PasswordManager implements IPasswordManager {
     }
 
     @Override
+    public Password getOrCreatePassword(String name, char[] password) {
+        for (Password pass : passwords) {
+            if (pass.getName().equals(name)) {
+                return pass;
+            }
+        }
+
+        Password pass = new Password(name, password);
+        pass.passwordManager = this;
+
+        passwords.add(pass);
+
+        return pass;
+    }
+
+    @Override
     public int getNumberOfPasswords() {
         return passwords.size();
+    }
+
+    @Override
+    public List<Category> getCategories() {
+        return Collections.unmodifiableList(categories);
+    }
+
+    @Override
+    public List<Password> getPasswords() {
+        return Collections.unmodifiableList(passwords);
     }
 
     @Override

@@ -1,32 +1,44 @@
 package fr.poulpocorp.poulpopass.core;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
-public class Password {
+public class Password extends PasswordManagerElement {
 
-    IPasswordManager passwordManager;
-
-    private String name;
-    private List<String> urls;
-    private List<Category> categories;
+    private Set<String> urls;
+    private Set<Category> categories;
 
     private char[] password;
 
-    public Password(String name, char[] password) {
-        this.name = name;
-        this.password = password;
+     Password(String name, char[] password) {
+         super(name);
+         this.password = password;
 
-        urls = new ArrayList<>();
-        categories = new ArrayList<>();
-    }
+         urls = new HashSet<>();
+         categories = new HashSet<>();
+     }
 
     public boolean associateWith(Category category) {
-        return false;
+        category.notifyAssociation(this);
+
+        return categories.add(category);
+    }
+
+    void notifyAssociation(Category category) {
+         categories.add(category);
     }
 
     public boolean dissociateWith(Category category) {
-        return false;
+         category.notifyDissociation(this);
+
+        return categories.remove(category);
+    }
+
+    void notifyDissociation(Category category) {
+         categories.remove(category);
     }
 
     public Category getCategoryByName(String name) {
@@ -39,8 +51,8 @@ public class Password {
         return null;
     }
 
-    public List<Category> getCategories() {
-        return categories;
+    public Set<Category> getCategories() {
+        return Collections.unmodifiableSet(categories);
     }
 
     public int getNumberOfCategories() {
