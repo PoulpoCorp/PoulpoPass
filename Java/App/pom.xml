@@ -11,4 +11,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>app</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>0.46</version>
+        </dependency>
+    </dependencies>
 </project>
