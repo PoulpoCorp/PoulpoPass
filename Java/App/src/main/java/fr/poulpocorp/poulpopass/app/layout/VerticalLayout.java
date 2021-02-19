@@ -194,7 +194,7 @@ public class VerticalLayout implements LayoutManager2 {
 
                 topY += getBottomGap(constraint) + compDim.height;
             } else {
-                botY = botY - getBottomGap(constraint) - compDim.width;
+                botY = botY - getBottomGap(constraint) - compDim.height;
 
                 component.setBounds(x, botY, w, compDim.height);
 
