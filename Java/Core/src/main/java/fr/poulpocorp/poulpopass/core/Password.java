@@ -51,6 +51,17 @@ public class Password extends PasswordManagerElement {
         return null;
     }
 
+    @Override
+    public boolean setName(String name) {
+        if (name == null || this.name.equals(name) || passwordManager.containsPasswordWithName(name)) {
+            return false;
+        }
+
+        this.name = name;
+
+        return true;
+    }
+
     public Set<Category> getCategories() {
         return Collections.unmodifiableSet(categories);
     }
@@ -71,23 +82,11 @@ public class Password extends PasswordManagerElement {
         return urls.toArray(new String[0]);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public char[] getPassword() {
         return password;
     }
 
     public void setPassword(char[] password) {
         this.password = password;
-    }
-
-    public IPasswordManager getPasswordManager() {
-        return passwordManager;
     }
 }

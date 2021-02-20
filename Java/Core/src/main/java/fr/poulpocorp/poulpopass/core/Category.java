@@ -43,23 +43,22 @@ public class Category extends PasswordManagerElement {
         return null;
     }
 
+    @Override
+    public boolean setName(String name) {
+        if (name == null || this.name.equals(name) || passwordManager.containsCategoryWithName(name)) {
+            return false;
+        }
+
+        this.name = name;
+
+        return true;
+    }
+
     public Set<Password> getPasswords() {
         return Collections.unmodifiableSet(passwords);
     }
 
     public int size() {
         return passwords.size();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public IPasswordManager getPasswordManager() {
-        return passwordManager;
     }
 }

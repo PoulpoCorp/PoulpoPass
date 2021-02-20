@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
-import java.util.stream.Stream;
 
 /**
  * File format
@@ -64,6 +63,216 @@ public class PasswordManager implements IPasswordManager {
 
         initAfterDecrypt(decryptedFile);
     }
+
+    @Override
+    public Category getOrCreateCategory(String name) {
+        for (Category c : categories) {
+            if (c.getName().equals(name)) {
+                return c;
+            }
+        }
+
+        Category category = new Category(name);
+        category.passwordManager = this;
+
+        categories.add(category);
+
+        return category;
+    }
+
+    @Override
+    public int getNumberOfCategories() {
+        return categories.size();
+    }
+
+    @Override
+    public Password getOrCreatePassword(String name, char[] password) {
+        Password pass = getPasswordIfExists(name);
+
+        if (pass == null) {
+            pass = new Password(name, password);
+            pass.passwordManager = this;
+
+            passwords.add(pass);
+        }
+
+        return pass;
+    }
+
+    @Override
+    public Category getCategoryIfExists(String name) {
+        for (Category category : categories) {
+            if (category.getName().equals(name)) {
+                return category;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public Password getPasswordIfExists(String name) {
+        for (Password password : passwords) {
+            if (password.getName().equals(name)) {
+                return password;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public boolean containsPasswordWithName(String name) {
+        return getPasswordIfExists(name) != null;
+    }
+
+    @Override
+    public boolean containsCategoryWithName(String name) {
+        return getCategoryIfExists(name) != null;
+    }
+
+    @Override
+    public boolean removePassword(Password password) {
+        if (passwords.remove(password)) {
+            password.passwordManager = null;
+
+            password.getCategories().forEach((category -> {
+                category.dissociateWith(password);
+            }));
+
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean removeCategory(Category category) {
+        if (categories.remove(category)) {
+            category.passwordManager = null;
+
+            category.getPasswords().forEach((password -> {
+                password.dissociateWith(category);
+            }));
+
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public int getNumberOfPasswords() {
+        return passwords.size();
+    }
+
+    @Override
+    public List<Category> getCategories() {
+        return Collections.unmodifiableList(categories);
+    }
+
+    @Override
+    public List<Password> getPasswords() {
+        return Collections.unmodifiableList(passwords);
+    }
+
+    @Override
+    public char[] getMasterPassword() {
+        return masterPassword;
+    }
+
+    @Override
+    public void setMasterPassword(char[] masterPassword) {
+        if (masterPassword != null) {
+            this.masterPassword = masterPassword;
+        }
+    }
+
+    @Override
+    public Path getPath() {
+        return path;
+    }
+
+    @Override
+    public void setPath(Path path) {
+        this.path = path;
+    }
+
+    /**
+     * SAVE
+     */
+
+    @Override
+    public void save() throws IOException, InvalidKeyException {
+        if (path == null || masterPassword == null) {
+            throw new NullPointerException("path is null");
+        }
+
+        if (masterPassword.length == 0) {
+            throw new InvalidKeyException("Master password is too short");
+        }
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        try {
+            writeCategories(os);
+
+            writeInteger(os, passwords.size());
+
+            for (Password password : passwords) {
+                writePassword(os, password);
+            }
+
+        } catch (IOException ignored) {} // ByteArrayOutputStream never throws IOException
+
+        byte[] encryptedData = CryptoUtils.encrypt(os.toByteArray(), masterPassword);
+
+        if (Files.notExists(path.getParent())) {
+            Files.createDirectories(path.getParent());
+        }
+
+        Files.write(path, encryptedData, StandardOpenOption.CREATE);
+    }
+
+    protected void writeCategories(ByteArrayOutputStream os) throws IOException {
+        writeInteger(os, categories.size());
+
+        for (Category category : categories) {
+            writeString(os, category.getName());
+        }
+    }
+
+    protected void writePassword(ByteArrayOutputStream os, Password password) throws IOException {
+        writeString(os, password.getName());
+        writeString(os, String.valueOf(password.getPassword()));
+
+        String[] urls = password.getURLs();
+
+        writeInteger(os, urls.length);
+        for (String url : urls) {
+            writeString(os, url);
+        }
+
+        Set<Category> categories = password.getCategories();
+        for (Category category : categories) {
+            writeInteger(os, this.categories.indexOf(category));
+        }
+    }
+
+    protected void writeString(ByteArrayOutputStream os, String str) throws IOException {
+        writeInteger(os, str.length());
+        os.write(str.getBytes());
+    }
+
+    protected void writeInteger(ByteArrayOutputStream os, int value) {
+        os.write((value >> 24) & 0xFF);
+        os.write((value >> 16) & 0xFF);
+        os.write((value >>  8) & 0xFF);
+        os.write( value        & 0xFF);
+    }
+
+    /**
+     * READ
+     */
 
     private int bytesToInt(byte[] str, int from, int to) throws ParseException {
         int return_v = 0;
@@ -169,144 +378,5 @@ public class PasswordManager implements IPasswordManager {
         }
 
         return from;
-    }
-
-    public void save() throws IOException, InvalidKeyException {
-        if (path == null || masterPassword == null) {
-            throw new NullPointerException("path is null");
-        }
-
-        if (masterPassword.length == 0) {
-            throw new IllegalStateException("Master password is too short");
-        }
-
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        try {
-            writeCategories(os);
-
-            writeInteger(os, passwords.size());
-
-            for (Password password : passwords) {
-                writePassword(os, password);
-            }
-
-        } catch (IOException ignored) {} // ByteArrayOutputStream never throws IOException
-
-        byte[] encryptedData = CryptoUtils.encrypt(os.toByteArray(), masterPassword);
-
-        if (Files.notExists(path.getParent())) {
-            Files.createDirectories(path.getParent());
-        }
-
-        Files.write(path, encryptedData, StandardOpenOption.CREATE);
-    }
-
-    protected void writeCategories(ByteArrayOutputStream os) throws IOException {
-        writeInteger(os, categories.size());
-
-        for (Category category : categories) {
-            writeString(os, category.getName());
-        }
-    }
-
-    protected void writePassword(ByteArrayOutputStream os, Password password) throws IOException {
-        writeString(os, password.getName());
-        writeString(os, String.valueOf(password.getPassword()));
-
-        String[] urls = password.getURLs();
-
-        writeInteger(os, urls.length);
-        for (String url : urls) {
-            writeString(os, url);
-        }
-
-        Set<Category> categories = password.getCategories();
-        for (Category category : categories) {
-            writeInteger(os, this.categories.indexOf(category));
-        }
-    }
-
-    protected void writeString(ByteArrayOutputStream os, String str) throws IOException {
-        writeInteger(os, str.length());
-        os.write(str.getBytes());
-    }
-
-    protected void writeInteger(ByteArrayOutputStream os, int value) {
-        os.write((value >> 24) & 0xFF);
-        os.write((value >> 16) & 0xFF);
-        os.write((value >>  8) & 0xFF);
-        os.write( value        & 0xFF);
-    }
-
-    @Override
-    public Category getOrCreateCategory(String name) {
-        for (Category c : categories) {
-            if (c.getName().equals(name)) {
-                return c;
-            }
-        }
-
-        Category category = new Category(name);
-        category.passwordManager = this;
-
-        categories.add(category);
-
-        return category;
-    }
-
-    @Override
-    public int getNumberOfCategories() {
-        return categories.size();
-    }
-
-    @Override
-    public Password getOrCreatePassword(String name, char[] password) {
-        for (Password pass : passwords) {
-            if (pass.getName().equals(name)) {
-                return pass;
-            }
-        }
-
-        Password pass = new Password(name, password);
-        pass.passwordManager = this;
-
-        passwords.add(pass);
-
-        return pass;
-    }
-
-    @Override
-    public int getNumberOfPasswords() {
-        return passwords.size();
-    }
-
-    @Override
-    public List<Category> getCategories() {
-        return Collections.unmodifiableList(categories);
-    }
-
-    @Override
-    public List<Password> getPasswords() {
-        return Collections.unmodifiableList(passwords);
-    }
-
-    @Override
-    public char[] getMasterPassword() {
-        return masterPassword;
-    }
-
-    @Override
-    public void setMasterPassword(char[] masterPassword) {
-        if (masterPassword != null) {
-            this.masterPassword = masterPassword;
-        }
-    }
-
-    public Path getPath() {
-        return path;
-    }
-
-    public void setPath(Path path) {
-        this.path = path;
     }
 }

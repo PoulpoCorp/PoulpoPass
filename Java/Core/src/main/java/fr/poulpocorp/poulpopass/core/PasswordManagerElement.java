@@ -14,9 +14,7 @@ public abstract class PasswordManagerElement {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public abstract boolean setName(String name);
 
     public IPasswordManager getPasswordManager() {
         return passwordManager;
