@@ -2,6 +2,7 @@ package fr.poulpocorp.poulpopass.core;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
@@ -17,8 +18,8 @@ public class Password extends PasswordManagerElement {
          super(name);
          this.password = password;
 
-         urls = new HashSet<>();
-         categories = new HashSet<>();
+         urls = new LinkedHashSet<>();
+         categories = new LinkedHashSet<>();
      }
 
     public boolean associateWith(Category category) {

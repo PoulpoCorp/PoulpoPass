@@ -55,9 +55,10 @@ public class PasswordManagerTest {
             checkPassword(manager.getPasswordIfExists("Alibaba"), "Alibaba", "alibaba".toCharArray(), "alibaba.com");
             checkPassword(manager.getPasswordIfExists("Youtube"), "Youtube", "youtube".toCharArray(), "youtube.com");
             checkPassword(manager.getPasswordIfExists("Twitch"), "Twitch", "twitch".toCharArray(), "twitch.tv");
+            checkPassword(manager.getPasswordIfExists("Blizzard"), "Blizzard", "blizzard".toCharArray(), "blizzard.com");
 
-            checkCategory(manager.getCategoryIfExists("Online sales"), "Online sales", manager.getPasswordIfExists("Alibaba"), manager.getPasswordIfExists("Amazon"));
-            checkCategory(manager.getCategoryIfExists("Google"), "Google", manager.getPasswordIfExists("Youtube"), manager.getPasswordIfExists("Gmail"));
+            checkCategory(manager.getCategoryIfExists("Online sales"), "Online sales", manager.getPasswordIfExists("Amazon"), manager.getPasswordIfExists("Alibaba"));
+            checkCategory(manager.getCategoryIfExists("Google"), "Google", manager.getPasswordIfExists("Gmail"), manager.getPasswordIfExists("Youtube"));
             checkCategory(manager.getCategoryIfExists("Video"), "Video", manager.getPasswordIfExists("Youtube"), manager.getPasswordIfExists("Twitch"));
 
         } finally {
