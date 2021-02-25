@@ -19,17 +19,18 @@ import java.util.Vector;
  *     n2                                   4 bytes, category name length
  *     category                             n2 bytes
  *     end for
+ * n                                        4 bytes, number of passwords
  * for each password:
- *     n                                    4 bytes, password name length
+ *     n2                                   4 bytes, password name length
  *     password name                        n bytes
- *     n                                    4 bytes, password length
+ *     n2                                   4 bytes, password length
  *     password                             n bytes
- *     n                                    4 bytes, number of urls
+ *     n2                                   4 bytes, number of urls
  *     for each urls:
- *         n2                               4 bytes, url length
+ *         n3                               4 bytes, url length
  *         url                              n2 bytes
  *         end for
- *     n                                    4 bytes, number of categories
+ *     n2                                   4 bytes, number of categories
  *     for each password's categories:
  *         i                                4 bytes, category index
  *         end for
@@ -217,7 +218,6 @@ public class PasswordManager implements IPasswordManager {
             writeCategories(os);
 
             writeInteger(os, passwords.size());
-
             for (Password password : passwords) {
                 writePassword(os, password);
             }
@@ -226,8 +226,11 @@ public class PasswordManager implements IPasswordManager {
 
         byte[] encryptedData = CryptoUtils.encrypt(os.toByteArray(), masterPassword);
 
-        if (Files.notExists(path.getParent())) {
-            Files.createDirectories(path.getParent());
+        Path parent = path.getParent();
+        if (parent != null) {
+            if (Files.notExists(parent)) {
+                Files.createDirectories(path.getParent());
+            }
         }
 
         Files.write(path, encryptedData, StandardOpenOption.CREATE);
@@ -253,6 +256,7 @@ public class PasswordManager implements IPasswordManager {
         }
 
         Set<Category> categories = password.getCategories();
+        writeInteger(os, categories.size());
         for (Category category : categories) {
             writeInteger(os, this.categories.indexOf(category));
         }
@@ -335,7 +339,7 @@ public class PasswordManager implements IPasswordManager {
             String password = bytesToString(file, from, passwordLen);
             from += passwordLen;
 
-            passwords.set(i, new Password(name, password.toCharArray()));
+            passwords.add(new Password(name, password.toCharArray()));
             from = parseURLS(file, from, i);
             from = linkCategories(file, from, i);
         }
@@ -344,15 +348,16 @@ public class PasswordManager implements IPasswordManager {
 
     private void initAfterDecrypt(byte[] decryptedFile) throws ParseException {
         int idxStart = 0, idxEnd = idxStart + 4;
-        int catNumber = 0;
-        try {
-            catNumber = bytesToInt(decryptedFile, idxStart, idxEnd);
-        } catch (Exception e) {
-            // TODO expected the number of categories
-        }
+        int catNumber = bytesToInt(decryptedFile, idxStart, idxEnd);
+
         categories = new Vector<>(catNumber);
         idxStart = idxEnd;
         idxStart = parseCategories(decryptedFile, idxStart);
+
+        int passNumber = bytesToInt(decryptedFile, idxStart, idxStart + 4);
+        passwords = new Vector<>(passNumber);
+
+        idxStart += 4;
         idxStart = parsePasswords(decryptedFile, idxStart);
     }
 

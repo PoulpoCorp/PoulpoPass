@@ -217,7 +217,7 @@ public class VerticalLayout implements LayoutManager2 {
 
     private int getXAlignment(int parentWidth, int compWidth, float xAlignment, int leftX) {
         if(parentWidth == compWidth || parentWidth == 0) {
-            return 0;
+            return leftX;
         } else {
             return (int) (xAlignment * (parentWidth - compWidth) + leftX);
         }
