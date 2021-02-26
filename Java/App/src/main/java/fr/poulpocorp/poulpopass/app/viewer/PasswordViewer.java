@@ -34,17 +34,20 @@ public class PasswordViewer extends AbstractPasswordViewer {
         passwordLabel.setForeground(passwordLabel.getForeground().darker());
 
         name = new JLabel(password.getName());
-        passwordField = Utils.createPasswordTextField(password.getPassword());
+        passwordField = Utils.createPasswordLabel(password.getPassword());
 
         VerticalConstraint constraint = new VerticalConstraint();
         constraint.xAlignment = 0;
 
         add(nameLabel, constraint);
         add(name, constraint);
+
         constraint.fillXAxis = true;
         add(new JSeparator(), constraint);
+
         constraint.fillXAxis = false;
         add(passwordLabel, constraint);
+
         constraint.fillXAxis = true;
         add(passwordField, constraint);
     }

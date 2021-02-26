@@ -1,9 +1,12 @@
 package fr.poulpocorp.poulpopass.app;
 
 import fr.poulpocorp.poulpopass.app.viewer.PasswordExplorer;
+import fr.poulpocorp.poulpopass.core.Category;
+import fr.poulpocorp.poulpopass.core.Password;
 import fr.poulpocorp.poulpopass.core.PasswordManager;
 
 import javax.swing.*;
+import java.nio.file.Path;
 
 public class App extends JFrame  {
 
@@ -17,13 +20,39 @@ public class App extends JFrame  {
     }
 
     private void initComponents() {
-        PasswordManager manager = new PasswordManager("Hello world".toCharArray());
+        char[] password = "Hello world".toCharArray();
+        Path path = Path.of("test.pass");
 
-        for (int i = 0; i < 10; i++) {
-            String name = "Password " + i;
+        PasswordManager manager = new PasswordManager(password);
+        manager.setPath(path);
 
-            manager.getOrCreatePassword(name, name.toCharArray());
-        }
+        Password gmail = manager.getOrCreatePassword("Gmail", "gmail".toCharArray());
+        gmail.addURL("gmail.com");
+
+        Password amazon = manager.getOrCreatePassword("Amazon", "amazon".toCharArray());
+        amazon.addURL("amazon.com");
+        Password alibaba = manager.getOrCreatePassword("Alibaba", "alibaba".toCharArray());
+        alibaba.addURL("alibaba.com");
+
+        Password youtube = manager.getOrCreatePassword("Youtube", "youtube".toCharArray());
+        youtube.addURL("youtube.com");
+        Password twitch = manager.getOrCreatePassword("Twitch", "twitch".toCharArray());
+        twitch.addURL("twitch.tv");
+
+        Category onlineSales = manager.getOrCreateCategory("Online sales");
+        onlineSales.associateWith(amazon);
+        onlineSales.associateWith(alibaba);
+
+        Category video = manager.getOrCreateCategory("Video");
+        youtube.associateWith(video);
+        twitch.associateWith(video);
+
+        Category google = manager.getOrCreateCategory("Google");
+        google.associateWith(gmail);
+        google.associateWith(youtube);
+
+        Password blizzard = manager.getOrCreatePassword("Blizzard", "blizzard".toCharArray());
+        blizzard.addURL("blizzard.com");
 
         add(new PasswordExplorer(manager));
     }
