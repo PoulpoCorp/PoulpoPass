@@ -1,45 +1,45 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
-import fr.poulpocorp.poulpopass.app.layout.VerticalLayout;
 import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;
+import fr.poulpocorp.poulpopass.app.utils.Icons;
 import fr.poulpocorp.poulpopass.app.utils.Utils;
 import fr.poulpocorp.poulpopass.core.Password;
 
 import javax.swing.*;
+import java.awt.*;
 
-public class PasswordViewer extends AbstractPasswordViewer {
+public class PasswordViewer extends AbstractViewer<Password> {
 
-    private Password password;
-
-    private JLabel name;
+    private JLabel nameLabel; // display name
+    private JLabel name;      // display the name of the password
     private PPPasswordTextField passwordField;
 
     public PasswordViewer(PasswordExplorer explorer, Password password) {
-        super(explorer);
-
-        this.password = password;
-
-        initComponents();
+        super(explorer, password);
     }
 
     @Override
-    protected void initComponents() {
-        setLayout(new VerticalLayout(5, 5));
+    protected Component getTopComponent() {
+        if (nameLabel == null) {
+            nameLabel = new JLabel("Name");
+            nameLabel.setForeground(nameLabel.getForeground().darker());
+        }
 
-        JLabel nameLabel = new JLabel("Name");
-        nameLabel.setForeground(nameLabel.getForeground().darker());
+        return nameLabel;
+    }
 
+    @Override
+    protected void initFields() {
         JLabel passwordLabel = new JLabel("Password");
         passwordLabel.setForeground(passwordLabel.getForeground().darker());
 
-        name = new JLabel(password.getName());
-        passwordField = Utils.createPasswordLabel(password.getPassword());
+        name = new JLabel(element.getName());
+        passwordField = Utils.createPasswordLabel(element.getPassword());
 
         VerticalConstraint constraint = new VerticalConstraint();
         constraint.xAlignment = 0;
 
-        add(nameLabel, constraint);
         add(name, constraint);
 
         constraint.fillXAxis = true;
@@ -50,5 +50,10 @@ public class PasswordViewer extends AbstractPasswordViewer {
 
         constraint.fillXAxis = true;
         add(passwordField, constraint);
+    }
+
+    @Override
+    protected Icon getIcon() {
+        return Icons.PASSWORD;
     }
 }
