@@ -46,9 +46,9 @@ public class PasswordExplorerLayout implements LayoutManager {
             rowWidth += size.width;
             rowHeight = Math.max(rowHeight, size.height);
 
-            if (x == 3 || i == count - 1) {
+            if (x == 3) {
                 dim.width = Math.max(rowWidth, dim.width) + x * GAP_BETWEEN_COMPONENTS;
-                dim.height += rowHeight;
+                dim.height += rowHeight + GAP_BETWEEN_COMPONENTS;
 
                 x = 0;
                 rowWidth = 0;
@@ -56,6 +56,11 @@ public class PasswordExplorerLayout implements LayoutManager {
             } else {
                 x++;
             }
+        }
+
+        if (x != 0) {
+            dim.width = Math.max(rowWidth, dim.width) + x * GAP_BETWEEN_COMPONENTS;
+            dim.height += rowHeight;
         }
 
         Insets insets = parent.getInsets();

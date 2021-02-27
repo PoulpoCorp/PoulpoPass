@@ -27,17 +27,17 @@ public class App extends JFrame  {
         manager.setPath(path);
 
         Password gmail = manager.getOrCreatePassword("Gmail", "gmail".toCharArray());
-        gmail.addURL("gmail.com");
+        gmail.addURL("https://www.gmail.com");
 
         Password amazon = manager.getOrCreatePassword("Amazon", "amazon".toCharArray());
-        amazon.addURL("amazon.com");
+        amazon.addURL("https://amazon.com/truck");
         Password alibaba = manager.getOrCreatePassword("Alibaba", "alibaba".toCharArray());
-        alibaba.addURL("alibaba.com");
+        alibaba.addURL("https://alibaba.com");
 
         Password youtube = manager.getOrCreatePassword("Youtube", "youtube".toCharArray());
-        youtube.addURL("youtube.com");
+        youtube.addURL("https://youtube.com");
         Password twitch = manager.getOrCreatePassword("Twitch", "twitch".toCharArray());
-        twitch.addURL("twitch.tv");
+        twitch.addURL("https://twitch.tv");
 
         Category onlineSales = manager.getOrCreateCategory("Online sales");
         onlineSales.associateWith(amazon);
@@ -52,7 +52,7 @@ public class App extends JFrame  {
         google.associateWith(youtube);
 
         Password blizzard = manager.getOrCreatePassword("Blizzard", "blizzard".toCharArray());
-        blizzard.addURL("blizzard.com");
+        blizzard.addURL("https://blizzard.com");
 
         add(new PasswordExplorer(manager));
     }
