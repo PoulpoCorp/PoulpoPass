@@ -43,4 +43,10 @@ public class PasswordExplorer extends JPanel {
 
         ViewerBorder.startAnimation(comp, comp.getViewerBorder());
     }
+
+    public void highlightCategory(Category category) {
+        CategoryViewer comp = categoryMap.get(category);
+
+        ViewerBorder.startAnimation(comp, comp.getViewerBorder());
+    }
 }

@@ -3,6 +3,7 @@ package fr.poulpocorp.poulpopass.app.viewer;
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
 import fr.poulpocorp.poulpopass.app.text.JLabelLink;
 import fr.poulpocorp.poulpopass.app.utils.Icons;
+import fr.poulpocorp.poulpopass.app.utils.Utils;
 import fr.poulpocorp.poulpopass.core.Category;
 import fr.poulpocorp.poulpopass.core.Password;
 
@@ -21,7 +22,7 @@ public class CategoryViewer extends AbstractViewer<Category> {
     protected Component getTopComponent() {
         if (nameLabel == null) {
             nameLabel = new JLabel(element.getName());
-            nameLabel.setForeground(nameLabel.getForeground().darker());
+            nameLabel.setForeground(Utils.applyThemeColorFunction(nameLabel.getForeground()));
         }
 
         return nameLabel;

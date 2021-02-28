@@ -1,10 +1,15 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
+import com.formdev.flatlaf.FlatClientProperties;
+import fr.poulpocorp.poulpopass.app.layout.HCOrientation;
+import fr.poulpocorp.poulpopass.app.layout.VCOrientation;
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
+import fr.poulpocorp.poulpopass.app.text.JLabelLink;
 import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;
 import fr.poulpocorp.poulpopass.app.utils.FaviconFetcher;
 import fr.poulpocorp.poulpopass.app.utils.Icons;
 import fr.poulpocorp.poulpopass.app.utils.Utils;
+import fr.poulpocorp.poulpopass.core.Category;
 import fr.poulpocorp.poulpopass.core.Password;
 
 import javax.swing.*;
@@ -31,7 +36,7 @@ public class PasswordViewer extends AbstractViewer<Password> {
     protected Component getTopComponent() {
         if (nameLabel == null) {
             nameLabel = new JLabel("Name");
-            nameLabel.setForeground(nameLabel.getForeground().darker());
+            nameLabel.setForeground(Utils.applyThemeColorFunction(nameLabel.getForeground()));
             nameLabel.setIcon(Icons.WEBSITE);
 
             String[] urls = element.getURLs();
@@ -46,14 +51,14 @@ public class PasswordViewer extends AbstractViewer<Password> {
 
     @Override
     protected void initFields() {
+        // General information: name, password
         passwordLabel = new JLabel("Password");
-        passwordLabel.setForeground(passwordLabel.getForeground().darker());
+
+        Color titleLabelColor = Utils.applyThemeColorFunction(passwordLabel.getForeground());
+        passwordLabel.setForeground(titleLabelColor);
 
         name = new JLabel(element.getName());
         passwordField = Utils.createPasswordLabel(element.getPassword());
-
-        urlLabel = new JLabel("Urls");
-        urlLabel.setForeground(urlLabel.getForeground().darker());
 
         VerticalConstraint constraint = new VerticalConstraint();
         constraint.xAlignment = 0;
@@ -68,6 +73,11 @@ public class PasswordViewer extends AbstractViewer<Password> {
 
         constraint.fillXAxis = true;
         add(passwordField, constraint);
+        add(new JSeparator(), constraint);
+
+        // urls
+        urlLabel = new JLabel("Urls");
+        urlLabel.setForeground(titleLabelColor);
 
         constraint.fillXAxis = false;
         add(urlLabel, constraint);
@@ -80,6 +90,33 @@ public class PasswordViewer extends AbstractViewer<Password> {
             urls.add(label);
             add(label, constraint);
         }
+
+        constraint.fillXAxis = true;
+        add(new JSeparator(), constraint);
+        constraint.fillXAxis = false;
+
+        // Categories
+        JLabel categoryLabel = new JLabel("In categories");
+        categoryLabel.setForeground(titleLabelColor);
+
+        add(categoryLabel, constraint);
+
+        for (Category category : element.getCategories()) {
+            JLabelLink link = new JLabelLink(category.getName());
+            link.addActionListener((l) -> {
+                explorer.highlightCategory(category);
+            });
+
+            add(link, constraint);
+        }
+
+        // edit button
+        JButton edit = new JButton(Icons.EDIT);
+        edit.putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_TOOLBAR_BUTTON);
+
+        constraint.orientation = VCOrientation.BOTTOM;
+        constraint.xAlignment = 1;
+        add(edit, constraint);
     }
 
     @Override

@@ -98,6 +98,8 @@ public class PasswordExplorerLayout implements LayoutManager {
         for (int i = 0, count = components.length; i < count; i++) {
             if (column == 0) {
                 // new row, compute height
+                rowHeight = 0;
+
                 int max = Math.min(i + numCols, components.length);
                 for (int j = i; j < max; j++) {
                     rowHeight = Math.max(rowHeight, components[j].getPreferredSize().height);
