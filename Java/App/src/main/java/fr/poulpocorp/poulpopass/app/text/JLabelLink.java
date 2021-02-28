@@ -46,7 +46,7 @@ public class JLabelLink extends JLabel {
     private void init() {
         addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseReleased(MouseEvent e) {
                 fireActionListener();
             }
 

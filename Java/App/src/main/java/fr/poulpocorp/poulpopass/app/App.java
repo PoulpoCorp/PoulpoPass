@@ -54,6 +54,9 @@ public class App extends JFrame  {
         Password blizzard = manager.getOrCreatePassword("Blizzard", "blizzard".toCharArray());
         blizzard.addURL("https://blizzard.com");
 
+        Password openGL = manager.getOrCreatePassword("OpenGL tutorial", "opengl tutorial".toCharArray());
+        openGL.addURL("http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/");
+
         add(new PasswordExplorer(manager));
     }
 }

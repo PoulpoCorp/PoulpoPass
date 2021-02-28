@@ -2,6 +2,7 @@ package fr.poulpocorp.poulpopass.app.viewer;
 
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
 import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;
+import fr.poulpocorp.poulpopass.app.utils.FaviconFetcher;
 import fr.poulpocorp.poulpopass.app.utils.Icons;
 import fr.poulpocorp.poulpopass.app.utils.Utils;
 import fr.poulpocorp.poulpopass.core.Password;
@@ -36,8 +37,7 @@ public class PasswordViewer extends AbstractViewer<Password> {
             String[] urls = element.getURLs();
 
             if (urls.length > 0) {
-                SwingWorker<Void, Void> worker = new FetchIconWorker(urls[0], nameLabel);
-                worker.execute();
+                FaviconFetcher.fetch(urls[0], 16, nameLabel::setIcon);
             }
         }
 
@@ -85,27 +85,5 @@ public class PasswordViewer extends AbstractViewer<Password> {
     @Override
     protected Icon getIcon() {
         return Icons.PASSWORD;
-    }
-
-    private static class FetchIconWorker extends SwingWorker<Void, Void> {
-
-        private String url;
-        private JLabel nameLabel;
-
-        public FetchIconWorker(String url, JLabel nameLabel) {
-            this.url = url;
-            this.nameLabel = nameLabel;
-        }
-
-        @Override
-        protected Void doInBackground() {
-            Icon icon = Icons.fetch(url, 16);
-
-            if (icon != null) {
-                nameLabel.setIcon(icon);
-            }
-
-            return null;
-        }
     }
 }
