@@ -9,9 +9,10 @@ public class Main {
 
     public static void main(String[] args) {
         FlatLaf.registerCustomDefaultsSource("theme");
-        FlatDarculaLaf.install();
 
         EventQueue.invokeLater(() -> {
+            FlatDarculaLaf.install();
+
             App app = new App();
             app.setVisible(true);
         });

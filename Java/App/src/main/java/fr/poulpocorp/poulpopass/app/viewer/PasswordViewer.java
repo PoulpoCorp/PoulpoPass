@@ -1,7 +1,6 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import fr.poulpocorp.poulpopass.app.layout.HCOrientation;
 import fr.poulpocorp.poulpopass.app.layout.VCOrientation;
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
 import fr.poulpocorp.poulpopass.app.text.JLabelLink;
@@ -19,14 +18,14 @@ import java.util.List;
 
 public class PasswordViewer extends AbstractViewer<Password> {
 
-    private JLabel passwordLabel;
-    private PPPasswordTextField passwordField;
-
     private JLabel nameLabel; // display name
     private JLabel name;      // display the name of the password
 
+    private JLabel passwordLabel;
+    private PPPasswordTextField passwordField;
+
     private JLabel urlLabel;
-    private List<JLabel> urls;
+    private ArrayList<JLabel> urlLabels;
 
     public PasswordViewer(PasswordExplorer explorer, Password password) {
         super(explorer, password);
@@ -82,12 +81,12 @@ public class PasswordViewer extends AbstractViewer<Password> {
         constraint.fillXAxis = false;
         add(urlLabel, constraint);
 
-        urls = new ArrayList<>();
+        urlLabels = new ArrayList<>();
 
         for (String url : element.getURLs()) {
             JLabel label = new JLabel(url);
 
-            urls.add(label);
+            urlLabels.add(label);
             add(label, constraint);
         }
 
@@ -113,10 +112,71 @@ public class PasswordViewer extends AbstractViewer<Password> {
         // edit button
         JButton edit = new JButton(Icons.EDIT);
         edit.putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_TOOLBAR_BUTTON);
+        edit.addActionListener((e) -> {
+            Window ancestor = SwingUtilities.getWindowAncestor(this);
+
+            boolean modified;
+            if (ancestor instanceof Frame) {
+                modified = EditPasswordDialog.showDialog((Frame) ancestor, element);
+            } else {
+                modified = EditPasswordDialog.showDialog(null, element);
+            }
+
+            if (modified) {
+                updateViewer();
+
+                revalidate();
+                repaint();
+            }
+        });
 
         constraint.orientation = VCOrientation.BOTTOM;
         constraint.xAlignment = 1;
         add(edit, constraint);
+    }
+
+    public void updateViewer() {
+        name.setText(element.getName());
+        passwordField.setText(String.valueOf(element.getPassword())); // TODO: Create a non String-api method
+
+        String[] urls = element.getURLs();
+
+        // If the first url has changed, we need to update the icon
+        if (urlLabels.size() > 0) {
+            String oldFirstUrl = urlLabels.get(0).getText();
+
+            if (!oldFirstUrl.equals(urls[0])) {
+                FaviconFetcher.fetch(urls[0], 16, nameLabel::setIcon); // update icon
+            }
+        }
+
+        // Update urls text
+        int length = Math.min(urls.length, urlLabels.size());
+        for (int i = 0; i < length; i++) {
+            urlLabels.get(i).setText(urls[i]);
+        }
+
+        if (urls.length > length) { // Need to add labels
+            int addIndex = getComponentZOrder(urlLabels.get(length - 1)) + 1;
+
+            VerticalConstraint constraint = new VerticalConstraint();
+            constraint.xAlignment = 0;
+
+            for (int i = length; i < urls.length; i++) {
+                JLabel label = new JLabel(urls[i]);
+
+                urlLabels.add(label);
+                add(label, constraint, addIndex);
+
+                addIndex++;
+            }
+        } else { // Need to remove labels
+            for (int i = length; i < urlLabels.size(); i++) {
+                remove(urlLabels.get(i));
+            }
+
+            urlLabels.trimToSize();
+        }
     }
 
     @Override

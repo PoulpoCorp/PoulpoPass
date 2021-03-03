@@ -11,7 +11,7 @@ public class Utils {
 
     public static PPPasswordTextField createPasswordTextField(char[] password) {
         PPPasswordTextField field = new PPPasswordTextField();
-        field.setText(String.valueOf(password));
+        field.setText(String.valueOf(password)); // TODO: Create a non String-api method
 
         JButton see = new JButton(Icons.SEE);
         see.setToolTipText("Show");

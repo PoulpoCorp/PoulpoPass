@@ -79,6 +79,10 @@ public class Password extends PasswordManagerElement {
         urls.remove(url);
     }
 
+    public void removeAllUrl() {
+         urls.clear();
+    }
+
     public String[] getURLs() {
         return urls.toArray(new String[0]);
     }

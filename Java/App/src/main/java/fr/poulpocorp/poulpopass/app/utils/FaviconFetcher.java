@@ -32,7 +32,7 @@ public class FaviconFetcher {
 
     private static final Logger LOGGER = LogManager.getLogger(FaviconFetcher.class);
 
-    private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(8, 8, 1L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new NamedThreadFactory("IconCacheWriter"));
+    private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(8, 8, 1L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new NamedThreadFactory("FaviconFetcher"));
     private static final HashMap<String, Icon> ICONS = new HashMap<>();
 
     public static final Path ICON_CACHE_PATH = Cache.of("icons");
@@ -49,6 +49,8 @@ public class FaviconFetcher {
 
             if (image != null) {
                 runSetter(setter, new ImageIcon(image));
+
+                LOGGER.info("Checking for icon update for {}", url);
             }
 
             // Check for icon update
