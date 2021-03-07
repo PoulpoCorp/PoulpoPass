@@ -3,6 +3,8 @@ package fr.poulpocorp.poulpopass.app.viewer;
 import com.formdev.flatlaf.FlatClientProperties;
 import fr.poulpocorp.poulpopass.app.layout.VCOrientation;
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
+import fr.poulpocorp.poulpopass.app.model.PasswordEditedListener;
+import fr.poulpocorp.poulpopass.app.model.PasswordEvent;
 import fr.poulpocorp.poulpopass.app.text.JLabelLink;
 import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;
 import fr.poulpocorp.poulpopass.app.utils.FaviconFetcher;
@@ -14,7 +16,6 @@ import fr.poulpocorp.poulpopass.core.Password;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class PasswordViewer extends AbstractViewer<Password> {
 
@@ -29,6 +30,8 @@ public class PasswordViewer extends AbstractViewer<Password> {
 
     public PasswordViewer(PasswordExplorer explorer, Password password) {
         super(explorer, password);
+
+        addPasswordEditedListener(this::updateViewer);
     }
 
     @Override
@@ -115,18 +118,15 @@ public class PasswordViewer extends AbstractViewer<Password> {
         edit.addActionListener((e) -> {
             Window ancestor = SwingUtilities.getWindowAncestor(this);
 
-            boolean modified;
+            PasswordEvent event;
             if (ancestor instanceof Frame) {
-                modified = EditPasswordDialog.showDialog((Frame) ancestor, element);
+                event = EditPasswordDialog.showDialog((Frame) ancestor, element);
             } else {
-                modified = EditPasswordDialog.showDialog(null, element);
+                event = EditPasswordDialog.showDialog(null, element);
             }
 
-            if (modified) {
-                updateViewer();
-
-                revalidate();
-                repaint();
+            if (event != null) {
+                firePasswordEditedListeners(event);
             }
         });
 
@@ -135,7 +135,7 @@ public class PasswordViewer extends AbstractViewer<Password> {
         add(edit, constraint);
     }
 
-    public void updateViewer() {
+    public void updateViewer(PasswordEvent event) {
         name.setText(element.getName());
         passwordField.setText(String.valueOf(element.getPassword())); // TODO: Create a non String-api method
 
@@ -177,10 +177,29 @@ public class PasswordViewer extends AbstractViewer<Password> {
 
             urlLabels.trimToSize();
         }
+
+        revalidate();
+        repaint();
     }
 
     @Override
     protected Icon getIcon() {
         return Icons.PASSWORD;
+    }
+
+    protected void firePasswordEditedListeners(PasswordEvent event) {
+        PasswordEditedListener[] listeners = listenerList.getListeners(PasswordEditedListener.class);
+
+        for (PasswordEditedListener listener : listeners) {
+            listener.passwordEdited(event);
+        }
+    }
+
+    public void addPasswordEditedListener(PasswordEditedListener listener) {
+        listenerList.add(PasswordEditedListener.class, listener);
+    }
+
+    public void removePasswordEditedListener(PasswordEditedListener listener) {
+        listenerList.remove(PasswordEditedListener.class, listener);
     }
 }

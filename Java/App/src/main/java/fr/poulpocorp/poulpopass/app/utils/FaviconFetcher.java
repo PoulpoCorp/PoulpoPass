@@ -90,10 +90,6 @@ public class FaviconFetcher {
                 }
             }
 
-            if (link.startsWith("//")) {
-                link = "https:" + link;
-            }
-
             String fileName = link.substring(link.lastIndexOf('/') + 1);
 
             Map<String, Object> params = new HashMap<>();
@@ -150,6 +146,12 @@ public class FaviconFetcher {
             }
         } else {
             link = element.attr("href");
+        }
+
+        if (link.startsWith("//")) {
+            link = "https:" + link;
+        } else if (link.startsWith("/")) {
+            link = document.baseUri() + link;
         }
 
         return link;

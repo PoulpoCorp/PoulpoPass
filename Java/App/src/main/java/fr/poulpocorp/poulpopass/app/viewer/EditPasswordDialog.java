@@ -2,6 +2,7 @@ package fr.poulpocorp.poulpopass.app.viewer;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import fr.poulpocorp.poulpopass.app.layout.*;
+import fr.poulpocorp.poulpopass.app.model.PasswordEvent;
 import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;
 import fr.poulpocorp.poulpopass.app.text.PPTextField;
 import fr.poulpocorp.poulpopass.app.utils.Icons;
@@ -10,20 +11,22 @@ import fr.poulpocorp.poulpopass.core.IPasswordManager;
 import fr.poulpocorp.poulpopass.core.Password;
 
 import javax.swing.*;
+import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class EditPasswordDialog extends JDialog {
 
     /**
-     * @return {@code true} if the given password has been modified
+     * @return {@link PasswordEvent} if the given password has been modified, otherwise {@code null}
      */
-    public static boolean showDialog(Frame parent, Password password) {
+    public static PasswordEvent showDialog(Frame parent, Password password) {
         EditPasswordDialog dialog = new EditPasswordDialog(parent, password);
 
-        return dialog.modified;
+        return dialog.event;
     }
 
     private final Password password;
@@ -39,7 +42,7 @@ public class EditPasswordDialog extends JDialog {
 
     private JPanel bottomPanel;
 
-    private boolean modified = false;
+    private PasswordEvent event = null;
 
     private EditPasswordDialog(Frame parent, Password password) {
         super(parent, "Edit password", true);
@@ -70,6 +73,9 @@ public class EditPasswordDialog extends JDialog {
      *             -> PPTextField url1
      *             -> ...
      *             -> PPTextField urlN
+     *             -> JPanel newUrlPanel with HorizontalLayout
+     *                  -> JLabel "New Url"
+     *                  -> JButton newUrlButton
      *   -> JPanel bottomPanel with HorizontalLayout
      *        -> JButton saveButton (at right)
      */
@@ -216,26 +222,40 @@ public class EditPasswordDialog extends JDialog {
     private void save(ActionEvent e) {
         IPasswordManager manager = password.getPasswordManager();
 
-        if (!nameField.getText().equals(password.getName()) &&              // check if the user changes the password name
-                manager.containsPasswordWithName(nameField.getText())) {
+        boolean passwordNameChanged = !nameField.getText().equals(password.getName());
+
+        if (passwordNameChanged && manager.containsPasswordWithName(nameField.getText())) {
             // no
             nameField.putClientProperty(FlatClientProperties.OUTLINE, FlatClientProperties.OUTLINE_ERROR);
             repaint();
-
         } else {
-            // yeah!
-            password.setName(nameField.getText());
-            password.setPassword(passwordField.getPassword());
+            int type = 0;
 
-            password.removeAllUrl();
-
-            for (PPTextField field : urlFields) {
-                password.addURL(field.getText());
+            if (password.setName(nameField.getText())) {
+                type = PasswordEvent.NAME;
             }
 
-            modified = true;
+            if (!Arrays.equals(passwordField.getPassword(), password.getPassword())) {
+                password.setPassword(passwordField.getPassword());
 
-            dispose();
+                type |= PasswordEvent.PASSWORD;
+            }
+
+            String[] urls = urlFields.stream()
+                    .map(JTextComponent::getText)
+                    .toArray(String[]::new);
+
+            if (!Arrays.equals(password.getURLs(), urls)) {
+                password.setURLs(urls);
+
+                type |= PasswordEvent.URLS;
+            }
+
+            if (type > 0) {
+                event = new PasswordEvent(password, type);
+
+                dispose();
+            }
         }
     }
 }

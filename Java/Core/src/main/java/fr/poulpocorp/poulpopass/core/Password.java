@@ -79,6 +79,14 @@ public class Password extends PasswordManagerElement {
         urls.remove(url);
     }
 
+    public void setURLs(String[] urls) {
+         if (urls != null) {
+             this.urls.clear();
+
+             Collections.addAll(this.urls, urls);
+         }
+    }
+
     public void removeAllUrl() {
          urls.clear();
     }
@@ -92,6 +100,8 @@ public class Password extends PasswordManagerElement {
     }
 
     public void setPassword(char[] password) {
-        this.password = password;
+        if (password != null) {
+            this.password = password;
+        }
     }
 }
