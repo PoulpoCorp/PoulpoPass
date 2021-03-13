@@ -12,6 +12,8 @@ public interface TagModel {
 
     boolean removeTag(Tag tag);
 
+    void removeAllTags();
+
     Tag getTag(String tag);
 
     boolean containsTag(String tag);

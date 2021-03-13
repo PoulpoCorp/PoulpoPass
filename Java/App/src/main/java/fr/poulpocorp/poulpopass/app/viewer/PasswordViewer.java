@@ -7,7 +7,6 @@ import fr.poulpocorp.poulpopass.app.model.PasswordEditedListener;
 import fr.poulpocorp.poulpopass.app.model.PasswordEvent;
 import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
 import fr.poulpocorp.poulpopass.app.tag.Tag;
-import fr.poulpocorp.poulpopass.app.text.JLabelLink;
 import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;
 import fr.poulpocorp.poulpopass.app.utils.FaviconFetcher;
 import fr.poulpocorp.poulpopass.app.utils.Icons;
@@ -17,6 +16,8 @@ import fr.poulpocorp.poulpopass.core.Password;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.nio.Buffer;
 import java.util.ArrayList;
 
 public class PasswordViewer extends AbstractViewer<Password> {
@@ -29,6 +30,8 @@ public class PasswordViewer extends AbstractViewer<Password> {
 
     private JLabel urlLabel;
     private ArrayList<JLabel> urlLabels;
+
+    private JTagComponent categories;
 
     public PasswordViewer(PasswordExplorer explorer, Password password) {
         super(explorer, password);
@@ -105,7 +108,7 @@ public class PasswordViewer extends AbstractViewer<Password> {
 
         add(categoryLabel, constraint);
 
-        JTagComponent categories = new JTagComponent();
+        categories = new JTagComponent();
         categories.setEditable(false);
 
         for (Category category : element.getCategories()) {
@@ -143,9 +146,39 @@ public class PasswordViewer extends AbstractViewer<Password> {
     }
 
     public void updateViewer(PasswordEvent event) {
-        name.setText(element.getName());
-        passwordField.setText(String.valueOf(element.getPassword())); // TODO: Create a non String-api method
+        int type = event.getType();
 
+        if ((type & PasswordEvent.NAME) != 0) {
+            name.setText(element.getName());
+        }
+        if ((type & PasswordEvent.PASSWORD) != 0) {
+            passwordField.setText(String.valueOf(element.getPassword())); // TODO: Create a non String-api method
+        }
+
+        boolean revalidate = false;
+        if ((type & PasswordEvent.URLS) != 0) {
+            updateLabel();
+
+            revalidate = true;
+        }
+
+        if ((type & PasswordEvent.ASSOCIATION) != 0) {
+            categories.removeAllTags();
+
+            for (Category category : element.getCategories()) {
+                Tag tag = categories.addTagToList(category.getName());
+
+                tag.addActionListener((e) -> explorer.highlightCategory(category));
+            }
+        }
+
+        if (revalidate) {
+            revalidate();
+            repaint();
+        }
+    }
+
+    private void updateLabel() {
         String[] urls = element.getURLs();
 
         // If the first url has changed, we need to update the icon
@@ -184,9 +217,6 @@ public class PasswordViewer extends AbstractViewer<Password> {
 
             urlLabels.trimToSize();
         }
-
-        revalidate();
-        repaint();
     }
 
     @Override

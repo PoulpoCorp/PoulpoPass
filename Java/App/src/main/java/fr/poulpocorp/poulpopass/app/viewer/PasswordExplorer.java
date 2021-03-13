@@ -1,5 +1,6 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
+import fr.poulpocorp.poulpopass.app.model.PasswordEvent;
 import fr.poulpocorp.poulpopass.core.Category;
 import fr.poulpocorp.poulpopass.core.Password;
 import fr.poulpocorp.poulpopass.core.PasswordManager;
@@ -35,6 +36,15 @@ public class PasswordExplorer extends JPanel {
 
             add(viewer);
             passwordMap.put(password, viewer);
+
+            viewer.addPasswordEditedListener((event) -> {
+                if ((event.getType() & PasswordEvent.ASSOCIATION) != 0) {
+                    for (Category category : password.getCategories()) {
+                        CategoryViewer categoryViewer = categoryMap.get(category);
+                        categoryViewer.updateViewer();
+                    }
+                }
+            });
         }
     }
 

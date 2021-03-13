@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatClientProperties;
 import fr.poulpocorp.poulpopass.app.layout.*;
 import fr.poulpocorp.poulpopass.app.model.PasswordEvent;
 import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
+import fr.poulpocorp.poulpopass.app.tag.Tag;
 import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;
 import fr.poulpocorp.poulpopass.app.text.PPTextField;
 import fr.poulpocorp.poulpopass.app.utils.Icons;
@@ -39,6 +40,7 @@ public class EditPasswordDialog extends JDialog {
     private JTextField nameField;
     private PPPasswordTextField passwordField;
     private final List<PPTextField> urlFields = new ArrayList<>();
+    private JTagComponent categories;
 
     private JPanel newUrlPanel;
 
@@ -119,7 +121,7 @@ public class EditPasswordDialog extends JDialog {
         newUrlButton.addActionListener(this::addURL);
 
         // Categories
-        JTagComponent categories = new JTagComponent();
+        categories = new JTagComponent();
         for (Category category : password.getPasswordManager().getCategories()) {
             categories.addTagToComboBox(category.getName());
         }
@@ -267,6 +269,23 @@ public class EditPasswordDialog extends JDialog {
                 type |= PasswordEvent.URLS;
             }
 
+            boolean modified = false;
+            for (Tag tag : categories.getTags()) {
+                Category category = manager.getOrCreateCategory(tag.getName());
+
+                boolean result;
+                if (tag.isSelected()) {
+                    result = password.associateWith(category);
+                } else {
+                    result = password.dissociateWith(category);
+                }
+
+                if (!modified && result) {
+                    modified = true;
+
+                    type |= PasswordEvent.ASSOCIATION;
+                }
+            }
             if (type > 0) {
                 event = new PasswordEvent(password, type);
 

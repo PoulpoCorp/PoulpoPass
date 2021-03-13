@@ -116,6 +116,15 @@ public class DefaultTagModel implements TagModel {
     }
 
     @Override
+    public void removeAllTags() {
+        if (elements.size() > 0) {
+            elements.clear();
+
+            fireTagListeners(null, TagEvent.CLEAR);
+        }
+    }
+
+    @Override
     public Tag getTag(String tag) {
         for (Tag t : elements) {
             if (t.getName().equals(tag)) {

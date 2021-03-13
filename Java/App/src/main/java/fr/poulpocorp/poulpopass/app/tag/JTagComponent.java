@@ -62,6 +62,10 @@ public class JTagComponent extends JComponent implements TagModel {
                 box.removeItem(event.getItem());
                 add(event.getItem().getButton(), order);
                 break;
+            case TagEvent.CLEAR:
+                box.removeAllItems();
+                removeAll();
+                add(box);
             default:
                 return;
         }
@@ -92,6 +96,11 @@ public class JTagComponent extends JComponent implements TagModel {
     @Override
     public boolean removeTag(Tag tag) {
         return model.removeTag(tag);
+    }
+
+    @Override
+    public void removeAllTags() {
+        model.removeAllTags();
     }
 
     @Override
