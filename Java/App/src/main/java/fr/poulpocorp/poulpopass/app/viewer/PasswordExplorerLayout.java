@@ -83,8 +83,8 @@ public class PasswordExplorerLayout implements LayoutManager {
         Dimension dim = parent.getSize();
         Insets insets = parent.getInsets();
 
-        dim.width -= insets.left - insets.right;
-        dim.height -= insets.top - insets.bottom;
+        dim.width = dim.width - insets.left - insets.right;
+        dim.height = dim.height - insets.top - insets.bottom;
 
         int x = insets.left;
         int column = 0;

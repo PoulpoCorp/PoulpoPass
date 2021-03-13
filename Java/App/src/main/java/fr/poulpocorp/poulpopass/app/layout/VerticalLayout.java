@@ -183,8 +183,8 @@ public class VerticalLayout implements LayoutManager2 {
                 x = insets.left;
                 w = width;
             } else {
-                x = getXAlignment(width, compDim.width, constraint.xAlignment, insets.left);
-                w = compDim.width;
+                w = Math.min(width, compDim.width);
+                x = getXAlignment(width, w, constraint.xAlignment, insets.left);
             }
 
             if (constraint.orientation == TOP) {
@@ -235,7 +235,7 @@ public class VerticalLayout implements LayoutManager2 {
             x = leftX;
             w = parentWidth;
         } else {
-            w = component.getPreferredSize().width;
+            w = Math.min(component.getPreferredSize().width, parentWidth);
             x = getXAlignment(parentWidth, w, constraint.xAlignment, leftX);
         }
 

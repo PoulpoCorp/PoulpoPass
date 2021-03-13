@@ -1,6 +1,9 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
+import fr.poulpocorp.poulpopass.app.layout.VerticalLayout;
+import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
+import fr.poulpocorp.poulpopass.app.tag.Tag;
 import fr.poulpocorp.poulpopass.app.text.JLabelLink;
 import fr.poulpocorp.poulpopass.app.utils.Icons;
 import fr.poulpocorp.poulpopass.app.utils.Utils;
@@ -9,6 +12,8 @@ import fr.poulpocorp.poulpopass.core.Password;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
 public class CategoryViewer extends AbstractViewer<Category> {
 
@@ -34,15 +39,26 @@ public class CategoryViewer extends AbstractViewer<Category> {
         constraint.xAlignment = 0;
         constraint.fillXAxis = true;
 
-        add(new JSeparator(), constraint);
+        JSeparator separator = new JSeparator();
+        add(separator, constraint);
         constraint.fillXAxis = false;
 
-        for (Password password : element.getPasswords()) {
-            JLabelLink link = new JLabelLink(password.getName());
-            link.addActionListener((l) -> explorer.highlightPassword(password));
+        JLabel passwordsLabel = new JLabel("Passwords");
+        Color fg = passwordsLabel.getForeground();
+        passwordsLabel.setForeground(Utils.applyThemeColorFunction(fg));
 
-            add(link, constraint);
+        JTagComponent passwords = new JTagComponent();
+        passwords.setEditable(false);
+
+        for (Password password : element.getPasswords()) {
+            Tag tag = passwords.addTagToList(password.getName());
+
+            tag.addActionListener((e) -> explorer.highlightPassword(password));
         }
+
+        add(passwordsLabel, constraint);
+        constraint.endComponent = true;
+        add(passwords, constraint);
     }
 
     @Override

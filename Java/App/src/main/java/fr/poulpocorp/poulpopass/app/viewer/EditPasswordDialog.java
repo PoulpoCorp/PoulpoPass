@@ -3,10 +3,12 @@ package fr.poulpocorp.poulpopass.app.viewer;
 import com.formdev.flatlaf.FlatClientProperties;
 import fr.poulpocorp.poulpopass.app.layout.*;
 import fr.poulpocorp.poulpopass.app.model.PasswordEvent;
+import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
 import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;
 import fr.poulpocorp.poulpopass.app.text.PPTextField;
 import fr.poulpocorp.poulpopass.app.utils.Icons;
 import fr.poulpocorp.poulpopass.app.utils.Utils;
+import fr.poulpocorp.poulpopass.core.Category;
 import fr.poulpocorp.poulpopass.core.IPasswordManager;
 import fr.poulpocorp.poulpopass.core.Password;
 
@@ -116,6 +118,15 @@ public class EditPasswordDialog extends JDialog {
         newUrlButton.putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_TOOLBAR_BUTTON);
         newUrlButton.addActionListener(this::addURL);
 
+        // Categories
+        JTagComponent categories = new JTagComponent();
+        for (Category category : password.getPasswordManager().getCategories()) {
+            categories.addTagToComboBox(category.getName());
+        }
+        for (Category category : password.getCategories()) {
+            categories.addTagToList(category.getName());
+        }
+
         // Bottom panel
         bottomPanel = new JPanel();
         bottomPanel.setLayout(new HorizontalLayout(3, 3));
@@ -160,6 +171,10 @@ public class EditPasswordDialog extends JDialog {
         constraint.fillXAxis = false;
         constraint.xAlignment = 1;
         content.add(newUrlPanel, constraint);
+
+        constraint.xAlignment = 0;
+        constraint.endComponent = true;
+        content.add(categories, constraint);
 
         scrollPane.setViewportView(content);
 
@@ -243,6 +258,7 @@ public class EditPasswordDialog extends JDialog {
 
             String[] urls = urlFields.stream()
                     .map(JTextComponent::getText)
+                    .filter((s) -> !s.isEmpty())
                     .toArray(String[]::new);
 
             if (!Arrays.equals(password.getURLs(), urls)) {

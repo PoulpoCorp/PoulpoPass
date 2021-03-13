@@ -15,6 +15,7 @@ public class App extends JFrame  {
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         initComponents();
+
         pack();
         setLocationRelativeTo(null);
     }
@@ -57,6 +58,9 @@ public class App extends JFrame  {
         Password openGL = manager.getOrCreatePassword("OpenGL tutorial", "opengl tutorial".toCharArray());
         openGL.addURL("http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/");
 
-        add(new PasswordExplorer(manager));
+        PasswordExplorer explorer = new PasswordExplorer(manager);
+        explorer.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        add(explorer);
     }
 }

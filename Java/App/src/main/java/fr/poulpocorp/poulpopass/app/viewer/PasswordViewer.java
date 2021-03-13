@@ -5,6 +5,8 @@ import fr.poulpocorp.poulpopass.app.layout.VCOrientation;
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
 import fr.poulpocorp.poulpopass.app.model.PasswordEditedListener;
 import fr.poulpocorp.poulpopass.app.model.PasswordEvent;
+import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
+import fr.poulpocorp.poulpopass.app.tag.Tag;
 import fr.poulpocorp.poulpopass.app.text.JLabelLink;
 import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;
 import fr.poulpocorp.poulpopass.app.utils.FaviconFetcher;
@@ -103,14 +105,18 @@ public class PasswordViewer extends AbstractViewer<Password> {
 
         add(categoryLabel, constraint);
 
-        for (Category category : element.getCategories()) {
-            JLabelLink link = new JLabelLink(category.getName());
-            link.addActionListener((l) -> {
-                explorer.highlightCategory(category);
-            });
+        JTagComponent categories = new JTagComponent();
+        categories.setEditable(false);
 
-            add(link, constraint);
+        for (Category category : element.getCategories()) {
+            Tag tag = categories.addTagToList(category.getName());
+
+            tag.addActionListener((e) -> explorer.highlightCategory(category));
         }
+
+        constraint.fillXAxis = true;
+        constraint.endComponent = true;
+        add(categories, constraint);
 
         // edit button
         JButton edit = new JButton(Icons.EDIT);
@@ -130,6 +136,7 @@ public class PasswordViewer extends AbstractViewer<Password> {
             }
         });
 
+        constraint.fillXAxis = false;
         constraint.orientation = VCOrientation.BOTTOM;
         constraint.xAlignment = 1;
         add(edit, constraint);
