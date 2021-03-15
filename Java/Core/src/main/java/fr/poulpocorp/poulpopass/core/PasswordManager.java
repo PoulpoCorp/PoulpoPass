@@ -12,29 +12,29 @@ import java.util.Set;
 import java.util.Vector;
 
 /**
- * File format
+ * File format:                                                             <br>
  *
- * n                                        4 bytes, number of categories
- * for each categories:
- *     n2                                   4 bytes, category name length
- *     category                             n2 bytes
- *     end for
- * n                                        4 bytes, number of passwords
- * for each password:
+ * n                                        4 bytes, number of categories   <br>
+ * for each categories:                                                     <br>
+ *     n2                                   4 bytes, category name length   <br>
+ *     category                             n2 bytes                        <br>
+ *     end for                                                              <br>
+ * n                                        4 bytes, number of passwords    <br>
+ * for each password:                                                       <br>
  *     n2                                   4 bytes, password name length
- *     password name                        n bytes
- *     n2                                   4 bytes, password length
- *     password                             n bytes
- *     n2                                   4 bytes, number of urls
- *     for each urls:
- *         n3                               4 bytes, url length
- *         url                              n2 bytes
- *         end for
- *     n2                                   4 bytes, number of categories
- *     for each password's categories:
- *         i                                4 bytes, category index
- *         end for
- *     end
+ *     password name                        n bytes                         <br>
+ *     n2                                   4 bytes, password length        <br>
+ *     password                             n bytes                         <br>
+ *     n2                                   4 bytes, number of urls         <br>
+ *     for each urls:                                                       <br>
+ *         n3                               4 bytes, url length             <br>
+ *         url                              n2 bytes                        <br>
+ *         end for                                                          <br>
+ *     n2                                   4 bytes, number of categories   <br>
+ *     for each password's categories:                                      <br>
+ *         i                                4 bytes, category index         <br>
+ *         end for                                                          <br>
+ *     end                                                                  <br>
  *
  * @author PoulpoGaz
  * @author DarkMiMolle
@@ -186,10 +186,14 @@ public class PasswordManager implements IPasswordManager {
     }
 
     @Override
-    public void setMasterPassword(char[] masterPassword) {
-        if (masterPassword != null) {
+    public boolean setMasterPassword(char[] masterPassword) {
+        if (masterPassword != null && masterPassword.length > 0) {
             this.masterPassword = masterPassword;
+
+            return true;
         }
+
+        return false;
     }
 
     @Override
@@ -209,7 +213,7 @@ public class PasswordManager implements IPasswordManager {
     @Override
     public void save() throws IOException, InvalidKeyException {
         if (path == null || masterPassword == null) {
-            throw new NullPointerException("path is null");
+            throw new NullPointerException("Path or master password is null");
         }
 
         if (masterPassword.length == 0) {

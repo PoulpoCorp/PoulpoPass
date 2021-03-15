@@ -12,6 +12,12 @@ public class Category extends PasswordManagerElement implements ICategory {
 
     private Set<Password> passwords;
 
+    /**
+     * Creates a new category.
+     * Only password managers can create a category
+     *
+     * @param name the name of this category
+     */
     Category(String name) {
         super(name);
         passwords = new LinkedHashSet<>();

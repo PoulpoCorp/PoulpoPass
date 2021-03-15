@@ -13,17 +13,17 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 
 /**
- * Utils class for encrypting and decrypting data
+ * Utilities class for encrypting and decrypting data
  *
- * References:
- *  -https://en.wikipedia.org/wiki/Advanced_Encryption_Standard
- *  -https://en.wikipedia.org/wiki/Authenticated_encryption#Authenticated_encryption_with_associated_data_(AEAD)
- *  -https://en.wikipedia.org/wiki/Galois/Counter_Mode
- *  -https://stackoverflow.com/questions/31851612/java-aes-gcm-nopadding-what-is-cipher-getiv-giving-me
- *  -https://stackoverflow.com/questions/7467798/aes-how-to-generate-key-from-password-for-every-algorithm-size
- *  -https://en.wikipedia.org/wiki/Salt_(cryptography)
- *  -https://crypto.stackexchange.com/questions/1776/can-you-help-me-understand-what-a-cryptographic-salt-is
- *  -https://en.wikipedia.org/wiki/Cryptographic_nonce
+ * References:<br>
+ * https://en.wikipedia.org/wiki/Advanced_Encryption_Standard<br>
+ * https://en.wikipedia.org/wiki/Authenticated_encryption#Authenticated_encryption_with_associated_data_(AEAD)<br>
+ * https://en.wikipedia.org/wiki/Galois/Counter_Mode<br>
+ * https://stackoverflow.com/questions/31851612/java-aes-gcm-nopadding-what-is-cipher-getiv-giving-me<br>
+ * https://stackoverflow.com/questions/7467798/aes-how-to-generate-key-from-password-for-every-algorithm-size<br>
+ * https://en.wikipedia.org/wiki/Salt_(cryptography)<br>
+ * https://crypto.stackexchange.com/questions/1776/can-you-help-me-understand-what-a-cryptographic-salt-is<br>
+ * https://en.wikipedia.org/wiki/Cryptographic_nonce<br>
  *
  * @author PoulpoGaz
  */

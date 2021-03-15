@@ -10,8 +10,8 @@ import java.util.function.Supplier;
  */
 public class Password extends PasswordManagerElement implements IPassword {
 
-    private List<String> urls;
-    private Set<Category> categories;
+    private final List<String> urls;
+    private final Set<Category> categories;
 
     private char[] password;
 

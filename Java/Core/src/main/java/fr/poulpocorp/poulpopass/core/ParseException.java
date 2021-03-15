@@ -1,11 +1,16 @@
 package fr.poulpocorp.poulpopass.core;
 
+import java.io.IOException;
+
 /**
+ * Signals that the password manager can't read the file
+ *
  * @author PoulpoGaz
  */
-public class ParseException extends Exception {
+public class ParseException extends IOException {
 
     public ParseException() {
+
     }
 
     public ParseException(String message) {
@@ -18,9 +23,5 @@ public class ParseException extends Exception {
 
     public ParseException(Throwable cause) {
         super(cause);
-    }
-
-    public ParseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 }
