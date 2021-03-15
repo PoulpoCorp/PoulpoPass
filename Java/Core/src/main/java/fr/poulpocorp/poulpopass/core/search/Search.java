@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * @author PoulpoGaz
+ */
 public class Search {
 
     public static List<Category> searchInCategory(PasswordManager manager, Filter<Category> filter) {

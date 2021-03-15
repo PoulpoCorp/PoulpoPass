@@ -2,6 +2,9 @@ package fr.poulpocorp.poulpopass.core.search;
 
 import fr.poulpocorp.poulpopass.core.PasswordManagerElement;
 
+/**
+ * @author PoulpoGaz
+ */
 public class AndFilter<T extends PasswordManagerElement> implements Filter<T> {
 
     private Filter<T> left;

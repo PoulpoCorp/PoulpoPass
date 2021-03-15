@@ -1,5 +1,10 @@
 package fr.poulpocorp.poulpopass.core;
 
+import java.util.Objects;
+
+/**
+ * @author PoulpoGaz
+ */
 public abstract class PasswordManagerElement {
 
     IPasswordManager passwordManager;
@@ -7,7 +12,7 @@ public abstract class PasswordManagerElement {
     protected String name;
 
     public PasswordManagerElement(String name) {
-        this.name = name;
+        this.name = Objects.requireNonNull(name);
     }
 
     public String getName() {

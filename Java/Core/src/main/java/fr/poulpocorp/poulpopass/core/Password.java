@@ -1,57 +1,45 @@
 package fr.poulpocorp.poulpopass.core;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
-public class Password extends PasswordManagerElement {
+/**
+ * @author PoulpoGaz
+ * @author DarkMiMolle
+ */
+public class Password extends PasswordManagerElement implements IPassword {
 
-    private Set<String> urls;
+    private List<String> urls;
     private Set<Category> categories;
 
     private char[] password;
 
-     Password(String name, char[] password) {
-         super(name);
-         this.password = password;
+    /**
+     * Creates a new password.
+     * Only password managers can create a password
+     *
+     * @param name the name of this password
+     * @param password the password array
+     */
+    Password(String name, char[] password) {
+        super(name);
+        this.password = Objects.requireNonNull(password);
 
-         urls = new LinkedHashSet<>();
-         categories = new LinkedHashSet<>();
-     }
-
-    public boolean associateWith(Category category) {
-        category.notifyAssociation(this);
-
-        return categories.add(category);
+        urls = new ArrayList<>();
+        categories = new LinkedHashSet<>();
     }
 
-    void notifyAssociation(Category category) {
-         categories.add(category);
-    }
-
-    public boolean dissociateWith(Category category) {
-         category.notifyDissociation(this);
-
-        return categories.remove(category);
-    }
-
-    void notifyDissociation(Category category) {
-         categories.remove(category);
-    }
-
-    public Category getCategoryByName(String name) {
-        for (Category category : categories) {
-            if (category.getName().equals(name)) {
-                return category;
-            }
-        }
-
-        return null;
-    }
-
+    /**
+     * Set the name of this password
+     * @param name the new name of this password
+     * @return returns {@code false} if:
+     *              -the name is {@code null}
+     *              -the new name is the same as the old name
+     *              -the password manager doesn't contains a password
+     *               with the same name
+     *         otherwise returns {@code true}
+     */
     @Override
     public boolean setName(String name) {
         if (name == null || this.name.equals(name) || passwordManager.containsPasswordWithName(name)) {
@@ -63,22 +51,162 @@ public class Password extends PasswordManagerElement {
         return true;
     }
 
+    /**
+     * @return the name of this password
+     */
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Set the password of this object
+     * @param password the new password
+     * @return returns {@code false} if:
+     *              -the password is {@code null}
+     *              -the new password is the same as the old password
+     *              -the new password length is 0
+     *         otherwise returns {@code true}
+     */
+    public boolean setPassword(char[] password) {
+        if (password != null && !Arrays.equals(this.password, password) && password.length > 0) {
+            this.password = password;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Users can modify the content of the char array
+     *
+     * @return the password char array
+     */
+    public char[] getPassword() {
+        return password;
+    }
+
+    /**
+     * Associate this password with the specified category
+     * Implementations should update the category set
+     *
+     * @param category the category with which the password will be associated
+     * @return returns {@code true} if this password can be associated with the category
+     */
+    @Override
+    public boolean associateWith(Category category) {
+        category.notifyAssociation(this);
+
+        return categories.add(category);
+    }
+
+    void notifyAssociation(Category category) {
+         categories.add(category);
+    }
+
+    /**
+     * Dissociate this password with the specified category
+     * Implementations should update the category set
+     *
+     * @param category the category with which the password will be dissociated
+     * @return returns {@code true} if this password can be dissociated with the category
+     */
+    @Override
+    public boolean dissociateWith(Category category) {
+         category.notifyDissociation(this);
+
+        return categories.remove(category);
+    }
+
+    void notifyDissociation(Category category) {
+         categories.remove(category);
+    }
+
+    /**
+     * @return An unmodifiable set of categories with which this password
+     *         is associated
+     */
+    @Override
     public Set<Category> getCategories() {
         return Collections.unmodifiableSet(categories);
     }
 
+    /**
+     * @return the number of categories with which this password is associated
+     */
+    @Override
     public int getNumberOfCategories() {
         return categories.size();
     }
 
+    /**
+     * Add the specified url to the list
+     *
+     * @param url the url to add to the list
+     */
+    @Override
     public void addURL(String url) {
         urls.add(url);
     }
 
-    public void removeURL(String url) {
-        urls.remove(url);
+    /**
+     * Add the specified url at the specified index to the list
+     *
+     * @param index the index to add the url
+     * @param url the url to add to the list
+     */
+    @Override
+    public void addURL(int index, String url) {
+        urls.add(index, url);
     }
 
+    /**
+     * Set the specified url at the specified index
+     *
+     * @param index the index to set the url
+     * @param url the url
+     */
+    @Override
+    public void setURL(int index, String url) {
+        urls.set(index, url);
+    }
+
+    /**
+     * Remove the specified url
+     *
+     * @param url the url to removed
+     * @return {@code true} if the url has been removed
+     */
+    @Override
+    public boolean removeURL(String url) {
+        return urls.remove(url);
+    }
+
+    /**
+     * Remove the url at the specified index
+     *
+     * @param index the index of the url to remove
+     */
+    @Override
+    public void removeURL(int index) {
+        urls.remove(index);
+    }
+
+    /**
+     * Remove all urls
+     */
+    @Override
+    public void removeAllURL() {
+        urls.clear();
+    }
+
+    /**
+     * Replace all urls by the specified array of urls
+     *
+     * @param urls the new urls
+     */
+    @Override
     public void setURLs(String[] urls) {
          if (urls != null) {
              this.urls.clear();
@@ -87,21 +215,29 @@ public class Password extends PasswordManagerElement {
          }
     }
 
-    public void removeAllUrl() {
-         urls.clear();
+    /**
+     * Add all urls
+     *
+     * @param c the collection of urls to add
+     */
+    @Override
+    public void addAll(Collection<? extends String> c) {
+        urls.addAll(c);
     }
 
-    public String[] getURLs() {
-        return urls.toArray(new String[0]);
+    /**
+     * @return an unmodifiable list of urls
+     */
+    @Override
+    public List<String> getURLs() {
+        return Collections.unmodifiableList(urls);
     }
 
-    public char[] getPassword() {
-        return password;
-    }
-
-    public void setPassword(char[] password) {
-        if (password != null) {
-            this.password = password;
-        }
+    /**
+     * @return the number of urls
+     */
+    @Override
+    public int getNumberOfURL() {
+        return urls.size();
     }
 }

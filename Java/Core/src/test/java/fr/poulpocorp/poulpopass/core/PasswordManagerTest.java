@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 public class PasswordManagerTest {
 
@@ -89,11 +90,19 @@ public class PasswordManagerTest {
         }
     }
 
-    private void assertEquals(Object[] a, Object[] b) {
+    private <E> void assertEquals(E[] a, E[] b) {
         Assertions.assertEquals(a.length, b.length);
 
         for (int i = 0; i < a.length; i++) {
             Assertions.assertEquals(a[i], b[i]);
+        }
+    }
+
+    private <E> void assertEquals(E[] a, List<E> b) {
+        Assertions.assertEquals(a.length, b.size());
+
+        for (int i = 0; i < a.length; i++) {
+            Assertions.assertEquals(a[i], b.get(i));
         }
     }
 }

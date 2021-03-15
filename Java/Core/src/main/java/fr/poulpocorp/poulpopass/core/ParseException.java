@@ -1,5 +1,8 @@
 package fr.poulpocorp.poulpopass.core;
 
+/**
+ * @author PoulpoGaz
+ */
 public class ParseException extends Exception {
 
     public ParseException() {

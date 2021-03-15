@@ -27,11 +27,15 @@ import java.security.spec.KeySpec;
  *
  * @author PoulpoGaz
  */
-public class CryptoUtils {
+public final class CryptoUtils {
 
     private static final int AUTHENTICATION_TAG_BIT_LENGTH = 128;
     private static final int IV_BYTE_LENGTH = 12;
     private static final int SALT_BYTE_LENGTH = 512;
+
+    private CryptoUtils() {
+
+    }
 
     /**
      * Generate an array of bytes of size {@code length}

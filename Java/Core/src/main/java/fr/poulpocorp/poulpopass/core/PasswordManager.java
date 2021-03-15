@@ -35,6 +35,9 @@ import java.util.Vector;
  *         i                                4 bytes, category index
  *         end for
  *     end
+ *
+ * @author PoulpoGaz
+ * @author DarkMiMolle
  */
 public class PasswordManager implements IPasswordManager {
 
@@ -248,9 +251,9 @@ public class PasswordManager implements IPasswordManager {
         writeString(os, password.getName());
         writeString(os, String.valueOf(password.getPassword()));
 
-        String[] urls = password.getURLs();
+        List<String> urls = password.getURLs();
 
-        writeInteger(os, urls.length);
+        writeInteger(os, urls.size());
         for (String url : urls) {
             writeString(os, url);
         }

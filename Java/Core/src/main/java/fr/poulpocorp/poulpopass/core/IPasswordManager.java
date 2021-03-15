@@ -5,6 +5,10 @@ import java.nio.file.Path;
 import java.security.InvalidKeyException;
 import java.util.List;
 
+/**
+ * @author PoulpoGaz
+ * @author DarkMiMolle
+ */
 public interface IPasswordManager {
 
     Category getOrCreateCategory(String name);
