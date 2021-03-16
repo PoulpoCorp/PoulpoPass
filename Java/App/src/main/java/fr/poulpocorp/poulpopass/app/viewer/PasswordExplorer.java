@@ -1,6 +1,9 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
+import fr.poulpocorp.poulpopass.app.model.PasswordEditedAdapter;
+import fr.poulpocorp.poulpopass.app.model.PasswordEditedListener;
 import fr.poulpocorp.poulpopass.app.model.PasswordEvent;
+import fr.poulpocorp.poulpopass.app.model.PasswordModel;
 import fr.poulpocorp.poulpopass.core.Category;
 import fr.poulpocorp.poulpopass.core.Password;
 import fr.poulpocorp.poulpopass.core.PasswordManager;
@@ -12,7 +15,7 @@ public class PasswordExplorer extends JPanel {
 
     private PasswordManager manager;
 
-    private final HashMap<Password, PasswordViewer> passwordMap = new HashMap<>();
+    private final HashMap<PasswordModel, PasswordViewer> passwordMap = new HashMap<>();
     private final HashMap<Category, CategoryViewer> categoryMap = new HashMap<>();
 
     public PasswordExplorer(PasswordManager manager) {
@@ -32,17 +35,34 @@ public class PasswordExplorer extends JPanel {
         }
 
         for (Password password : manager.getPasswords()) {
-            PasswordViewer viewer = new PasswordViewer(this, password);
+            PasswordModel model = new PasswordModel(password);
+
+            PasswordViewer viewer = new PasswordViewer(this, model);
 
             add(viewer);
-            passwordMap.put(password, viewer);
+            passwordMap.put(model, viewer);
 
-            viewer.addPasswordEditedListener((event) -> {
-                if ((event.getType() & PasswordEvent.ASSOCIATION) != 0) {
-                    for (Category category : password.getCategories()) {
-                        CategoryViewer categoryViewer = categoryMap.get(category);
-                        categoryViewer.updateViewer();
+            model.addPasswordEditedListener(new PasswordEditedAdapter() {
+                @Override
+                public void passwordEdited(PasswordEvent event) {
+                    int type = event.getType();
+
+                    if ((type & PasswordEvent.NAME) != 0 || (type & PasswordEvent.ASSOCIATION) != 0) {
+                        for (Category category : password.getCategories()) {
+                            CategoryViewer categoryViewer = categoryMap.get(category);
+                            categoryViewer.updateViewer();
+                        }
                     }
+                }
+
+                @Override
+                public void nameChanged(PasswordEvent event) {
+                    passwordEdited(event);
+                }
+
+                @Override
+                public void associationsChanged(PasswordEvent event) {
+                    passwordEdited(event);
                 }
             });
         }

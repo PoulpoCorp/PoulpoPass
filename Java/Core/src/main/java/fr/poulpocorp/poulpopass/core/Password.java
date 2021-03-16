@@ -204,15 +204,28 @@ public class Password extends PasswordManagerElement implements IPassword {
     /**
      * Replace all urls by the specified array of urls
      *
-     * @param urls the new urls
+     * @param urls the new urls.
+     *             {@code null} clear the list
      */
     @Override
     public void setURLs(String[] urls) {
-         if (urls != null) {
-             this.urls.clear();
+        this.urls.clear();
 
-             Collections.addAll(this.urls, urls);
+        if (urls != null) {
+            Collections.addAll(this.urls, urls);
          }
+    }
+
+    /**
+     * Replace all urls by the specified list of urls
+     *
+     * @param urls the new urls.
+     *             {@code null} clear the list
+     */
+    @Override
+    public void setURLs(List<String> urls) {
+        this.urls.clear();
+        this.urls.addAll(urls);
     }
 
     /**

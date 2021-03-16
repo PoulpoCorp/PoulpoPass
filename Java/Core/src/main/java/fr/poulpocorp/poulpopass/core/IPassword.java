@@ -129,9 +129,18 @@ public interface IPassword {
     /**
      * Replace all urls by the specified array of urls
      *
-     * @param urls the new urls
+     * @param urls the new urls.
+     *             {@code null} clear the list
      */
     void setURLs(String[] urls);
+
+    /**
+     * Replace all urls by the specified list of urls
+     *
+     * @param urls the new urls.
+     *             {@code null} clear the list
+     */
+    void setURLs(List<String> urls);
 
     /**
      * @return an unmodifiable list of urls

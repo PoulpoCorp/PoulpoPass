@@ -24,7 +24,7 @@ public class JTagComponent extends JComponent implements TagModel {
         box.setRenderer(new CellRenderer());
         box.addItemListener((e) -> {
             if (e.getItem() != null && fire && model.isEditable()) {
-                addTagToList(((Tag) e.getItem()).getName());
+                model.moveTag(((Tag) e.getItem()).getName());
             }
         });
 
@@ -89,6 +89,16 @@ public class JTagComponent extends JComponent implements TagModel {
     }
 
     @Override
+    public void moveTag(String tag) {
+        model.moveTag(tag);
+    }
+
+    @Override
+    public void moveTag(Tag tag) {
+        model.moveTag(tag);
+    }
+
+    @Override
     public Tag removeTag(String tag) {
         return model.removeTag(tag);
     }
@@ -99,6 +109,21 @@ public class JTagComponent extends JComponent implements TagModel {
     }
 
     @Override
+    public Tag removeTagAt(int index) {
+        return model.removeTagAt(index);
+    }
+
+    @Override
+    public Tag removeTagInComboBoxAt(int index) {
+        return model.removeTagInComboBoxAt(index);
+    }
+
+    @Override
+    public Tag removeTagInListAt(int index) {
+        return model.removeTagInListAt(index);
+    }
+
+    @Override
     public void removeAllTags() {
         model.removeAllTags();
     }
@@ -106,6 +131,21 @@ public class JTagComponent extends JComponent implements TagModel {
     @Override
     public Tag getTag(String tag) {
         return model.getTag(tag);
+    }
+
+    @Override
+    public Tag getTagInComboBoxAt(int index) {
+        return model.getTagInComboBoxAt(index);
+    }
+
+    @Override
+    public Tag getTagInListAt(int index) {
+        return model.getTagInListAt(index);
+    }
+
+    @Override
+    public Tag getTagAt(int index) {
+        return model.getTagAt(index);
     }
 
     @Override

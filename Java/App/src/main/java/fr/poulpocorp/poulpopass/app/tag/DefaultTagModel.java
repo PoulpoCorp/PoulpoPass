@@ -26,22 +26,7 @@ public class DefaultTagModel implements TagModel {
 
     @Override
     public Tag addTagToComboBox(String tag) {
-        Tag t = getTag(tag);
-
-        if (t != null) {
-            if (t.isSelected()) {
-                elements.remove(t);
-                elements.addFirst(t);
-
-                t.selected = false;
-
-                fireTagListeners(t, TagEvent.TAG_MOVED_TO_COMBO);
-            }
-
-            return null;
-        }
-
-        t = new Tag(tag, false);
+        Tag t = new Tag(tag, false);
         t.addActionListener(createButtonListener(t));
 
         elements.addFirst(t);
@@ -54,22 +39,7 @@ public class DefaultTagModel implements TagModel {
 
     @Override
     public Tag addTagToList(String tag) {
-        Tag t = getTag(tag);
-
-        if (t != null) {
-            if (!t.isSelected()) {
-                elements.remove(t);
-                elements.addSecond(t);
-
-                t.selected = true;
-
-                fireTagListeners(t, TagEvent.TAG_MOVED_TO_LIST);
-            }
-
-            return null;
-        }
-
-        t = new Tag(tag, true);
+        Tag t = new Tag(tag, true);
         t.addActionListener(createButtonListener(t));
 
         elements.addSecond(t);
@@ -82,9 +52,28 @@ public class DefaultTagModel implements TagModel {
     protected ActionListener createButtonListener(Tag tag) {
         return (event) -> {
             if (editable) {
-                addTagToComboBox(tag.getName());
+                moveTag(tag.getName());
             }
         };
+    }
+
+    @Override
+    public void moveTag(Tag tag) {
+        if (tag != null) {
+            elements.remove(tag);
+            elements.addSecond(tag);
+
+            tag.selected = !tag.selected;
+
+            int type = tag.selected ? TagEvent.TAG_MOVED_TO_LIST : TagEvent.TAG_MOVED_TO_COMBO;
+
+            fireTagListeners(tag, type);
+        }
+    }
+
+    @Override
+    public void moveTag(String tag) {
+        moveTag(getTag(tag));
     }
 
     @Override
@@ -116,6 +105,39 @@ public class DefaultTagModel implements TagModel {
     }
 
     @Override
+    public Tag removeTagAt(int index) {
+        Tag tag = elements.remove(index);
+
+        if (tag != null) {
+            fireTagListeners(tag, TagEvent.TAG_REMOVED);
+        }
+
+        return tag;
+    }
+
+    @Override
+    public Tag removeTagInComboBoxAt(int index) {
+        Tag tag = elements.getFirst().remove(index);
+
+        if (tag != null) {
+            fireTagListeners(tag, TagEvent.TAG_REMOVED);
+        }
+
+        return tag;
+    }
+
+    @Override
+    public Tag removeTagInListAt(int index) {
+        Tag tag = elements.getSecond().remove(index);
+
+        if (tag != null) {
+            fireTagListeners(tag, TagEvent.TAG_REMOVED);
+        }
+
+        return tag;
+    }
+
+    @Override
     public void removeAllTags() {
         if (elements.size() > 0) {
             elements.clear();
@@ -133,6 +155,21 @@ public class DefaultTagModel implements TagModel {
         }
 
         return null;
+    }
+
+    @Override
+    public Tag getTagInComboBoxAt(int index) {
+        return elements.getFirst().get(index);
+    }
+
+    @Override
+    public Tag getTagInListAt(int index) {
+        return elements.getSecond().get(index);
+    }
+
+    @Override
+    public Tag getTagAt(int index) {
+        return elements.get(index);
     }
 
     @Override

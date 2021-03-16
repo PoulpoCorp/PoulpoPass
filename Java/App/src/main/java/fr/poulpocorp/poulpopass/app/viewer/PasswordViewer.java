@@ -5,6 +5,7 @@ import fr.poulpocorp.poulpopass.app.layout.VCOrientation;
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
 import fr.poulpocorp.poulpopass.app.model.PasswordEditedListener;
 import fr.poulpocorp.poulpopass.app.model.PasswordEvent;
+import fr.poulpocorp.poulpopass.app.model.PasswordModel;
 import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
 import fr.poulpocorp.poulpopass.app.tag.Tag;
 import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;
@@ -12,15 +13,15 @@ import fr.poulpocorp.poulpopass.app.utils.FaviconFetcher;
 import fr.poulpocorp.poulpopass.app.utils.Icons;
 import fr.poulpocorp.poulpopass.app.utils.Utils;
 import fr.poulpocorp.poulpopass.core.Category;
-import fr.poulpocorp.poulpopass.core.Password;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.nio.Buffer;
 import java.util.ArrayList;
+import java.util.List;
 
-public class PasswordViewer extends AbstractViewer<Password> {
+public class PasswordViewer extends AbstractViewer implements PasswordEditedListener {
+
+    private PasswordModel model;
 
     private JLabel nameLabel; // display name
     private JLabel name;      // display the name of the password
@@ -33,10 +34,13 @@ public class PasswordViewer extends AbstractViewer<Password> {
 
     private JTagComponent categories;
 
-    public PasswordViewer(PasswordExplorer explorer, Password password) {
-        super(explorer, password);
+    public PasswordViewer(PasswordExplorer explorer, PasswordModel model) {
+        super(explorer);
 
-        addPasswordEditedListener(this::updateViewer);
+        this.model = model;
+        initComponents();
+
+        model.addPasswordEditedListener(this);
     }
 
     @Override
@@ -46,10 +50,10 @@ public class PasswordViewer extends AbstractViewer<Password> {
             nameLabel.setForeground(Utils.applyThemeColorFunction(nameLabel.getForeground()));
             nameLabel.setIcon(Icons.WEBSITE);
 
-            String[] urls = element.getURLs();
+            List<String> urls = model.getURLs();
 
-            if (urls.length > 0) {
-                FaviconFetcher.fetch(urls[0], 16, nameLabel::setIcon);
+            if (urls.size() > 0) {
+                FaviconFetcher.fetch(urls.get(0), 16, nameLabel::setIcon);
             }
         }
 
@@ -64,8 +68,8 @@ public class PasswordViewer extends AbstractViewer<Password> {
         Color titleLabelColor = Utils.applyThemeColorFunction(passwordLabel.getForeground());
         passwordLabel.setForeground(titleLabelColor);
 
-        name = new JLabel(element.getName());
-        passwordField = Utils.createPasswordLabel(element.getPassword());
+        name = new JLabel(model.getName());
+        passwordField = Utils.createPasswordLabel(model.getPassword());
 
         VerticalConstraint constraint = new VerticalConstraint();
         constraint.xAlignment = 0;
@@ -91,7 +95,7 @@ public class PasswordViewer extends AbstractViewer<Password> {
 
         urlLabels = new ArrayList<>();
 
-        for (String url : element.getURLs()) {
+        for (String url : model.getURLs()) {
             JLabel label = new JLabel(url);
 
             urlLabels.add(label);
@@ -111,7 +115,7 @@ public class PasswordViewer extends AbstractViewer<Password> {
         categories = new JTagComponent();
         categories.setEditable(false);
 
-        for (Category category : element.getCategories()) {
+        for (Category category : model.getCategories()) {
             Tag tag = categories.addTagToList(category.getName());
 
             tag.addActionListener((e) -> explorer.highlightCategory(category));
@@ -127,15 +131,10 @@ public class PasswordViewer extends AbstractViewer<Password> {
         edit.addActionListener((e) -> {
             Window ancestor = SwingUtilities.getWindowAncestor(this);
 
-            PasswordEvent event;
             if (ancestor instanceof Frame) {
-                event = EditPasswordDialog.showDialog((Frame) ancestor, element);
+                EditPasswordDialog.showDialog((Frame) ancestor, model);
             } else {
-                event = EditPasswordDialog.showDialog(null, element);
-            }
-
-            if (event != null) {
-                firePasswordEditedListeners(event);
+                EditPasswordDialog.showDialog(null, model);
             }
         });
 
@@ -145,65 +144,49 @@ public class PasswordViewer extends AbstractViewer<Password> {
         add(edit, constraint);
     }
 
-    public void updateViewer(PasswordEvent event) {
-        int type = event.getType();
-
-        if ((type & PasswordEvent.NAME) != 0) {
-            name.setText(element.getName());
-        }
-        if ((type & PasswordEvent.PASSWORD) != 0) {
-            passwordField.setText(String.valueOf(element.getPassword())); // TODO: Create a non String-api method
-        }
-
-        boolean revalidate = false;
-        if ((type & PasswordEvent.URLS) != 0) {
-            updateLabel();
-
-            revalidate = true;
-        }
-
-        if ((type & PasswordEvent.ASSOCIATION) != 0) {
-            categories.removeAllTags();
-
-            for (Category category : element.getCategories()) {
-                Tag tag = categories.addTagToList(category.getName());
-
-                tag.addActionListener((e) -> explorer.highlightCategory(category));
-            }
-        }
-
-        if (revalidate) {
-            revalidate();
-            repaint();
-        }
+    @Override
+    protected Icon getIcon() {
+        return Icons.PASSWORD;
     }
 
-    private void updateLabel() {
-        String[] urls = element.getURLs();
+    @Override
+    public void nameChanged(PasswordEvent event) {
+        name.setText(model.getName());
+    }
+
+    @Override
+    public void passwordChanged(PasswordEvent event) {
+        passwordField.setText(String.valueOf(model.getPassword())); // TODO: Create a non String-api method
+    }
+
+    @Override
+    public void urlsChanged(PasswordEvent event) {
+        List<String> urls = model.getURLs();
 
         // If the first url has changed, we need to update the icon
         if (urlLabels.size() > 0) {
             String oldFirstUrl = urlLabels.get(0).getText();
 
-            if (!oldFirstUrl.equals(urls[0])) {
-                FaviconFetcher.fetch(urls[0], 16, nameLabel::setIcon); // update icon
+            String first = urls.get(0);
+            if (!oldFirstUrl.equals(first)) {
+                FaviconFetcher.fetch(first, 16, nameLabel::setIcon); // update icon
             }
         }
 
         // Update urls text
-        int length = Math.min(urls.length, urlLabels.size());
+        int length = Math.min(urls.size(), urlLabels.size());
         for (int i = 0; i < length; i++) {
-            urlLabels.get(i).setText(urls[i]);
+            urlLabels.get(i).setText(urls.get(i));
         }
 
-        if (urls.length > length) { // Need to add labels
+        if (urls.size() > length) { // Need to add labels
             int addIndex = getComponentZOrder(urlLabels.get(length - 1)) + 1;
 
             VerticalConstraint constraint = new VerticalConstraint();
             constraint.xAlignment = 0;
 
-            for (int i = length; i < urls.length; i++) {
-                JLabel label = new JLabel(urls[i]);
+            for (int i = length; i < urls.size(); i++) {
+                JLabel label = new JLabel(urls.get(i));
 
                 urlLabels.add(label);
                 add(label, constraint, addIndex);
@@ -217,26 +200,22 @@ public class PasswordViewer extends AbstractViewer<Password> {
 
             urlLabels.trimToSize();
         }
+
+        revalidate();
+        repaint();
     }
 
     @Override
-    protected Icon getIcon() {
-        return Icons.PASSWORD;
-    }
+    public void associationsChanged(PasswordEvent event) {
+        categories.removeAllTags();
 
-    protected void firePasswordEditedListeners(PasswordEvent event) {
-        PasswordEditedListener[] listeners = listenerList.getListeners(PasswordEditedListener.class);
+        for (Category category : model.getCategories()) {
+            Tag tag = categories.addTagToList(category.getName());
 
-        for (PasswordEditedListener listener : listeners) {
-            listener.passwordEdited(event);
+            tag.addActionListener((e) -> explorer.highlightCategory(category));
         }
-    }
 
-    public void addPasswordEditedListener(PasswordEditedListener listener) {
-        listenerList.add(PasswordEditedListener.class, listener);
-    }
-
-    public void removePasswordEditedListener(PasswordEditedListener listener) {
-        listenerList.remove(PasswordEditedListener.class, listener);
+        revalidate();
+        repaint();
     }
 }

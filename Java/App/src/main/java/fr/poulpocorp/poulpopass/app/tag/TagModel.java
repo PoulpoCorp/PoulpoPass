@@ -8,13 +8,29 @@ public interface TagModel {
 
     Tag addTagToList(String tag);
 
+    void moveTag(String tag);
+
+    void moveTag(Tag tag);
+
     Tag removeTag(String tag);
 
     boolean removeTag(Tag tag);
 
+    Tag removeTagAt(int index);
+
+    Tag removeTagInComboBoxAt(int index);
+
+    Tag removeTagInListAt(int index);
+
     void removeAllTags();
 
     Tag getTag(String tag);
+
+    Tag getTagInComboBoxAt(int index);
+
+    Tag getTagInListAt(int index);
+
+    Tag getTagAt(int index);
 
     boolean containsTag(String tag);
 

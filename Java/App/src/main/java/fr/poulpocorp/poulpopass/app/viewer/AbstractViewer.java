@@ -2,26 +2,22 @@ package fr.poulpocorp.poulpopass.app.viewer;
 
 import fr.poulpocorp.poulpopass.app.layout.*;
 import fr.poulpocorp.poulpopass.app.utils.WrapBorder;
-import fr.poulpocorp.poulpopass.core.PasswordManagerElement;
 
 import javax.swing.*;
 import java.awt.*;
 
-public abstract class AbstractViewer<E extends PasswordManagerElement> extends JComponent {
+public abstract class AbstractViewer extends JComponent {
 
     protected final PasswordExplorer explorer;
-    protected E element;
 
     protected final ViewerBorder viewerBorder;
 
-    public AbstractViewer(PasswordExplorer explorer, E element) {
+    public AbstractViewer(PasswordExplorer explorer) {
         this.explorer = explorer;
-        this.element = element;
 
         viewerBorder = new ViewerBorder();
 
         setBorder(new WrapBorder(viewerBorder, BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        initComponents();
     }
 
     protected void initComponents() {

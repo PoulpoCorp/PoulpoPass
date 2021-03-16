@@ -29,6 +29,11 @@ public class Tag {
         button.removeActionListener(listener);
     }
 
+    public void setName(String name) {
+        this.name = name;
+        button.setText(name);
+    }
+
     public String getName() {
         return name;
     }

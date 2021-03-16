@@ -2,7 +2,7 @@ package fr.poulpocorp.poulpopass.app.viewer;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import fr.poulpocorp.poulpopass.app.layout.*;
-import fr.poulpocorp.poulpopass.app.model.PasswordEvent;
+import fr.poulpocorp.poulpopass.app.model.PasswordModel;
 import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
 import fr.poulpocorp.poulpopass.app.tag.Tag;
 import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;
@@ -11,7 +11,6 @@ import fr.poulpocorp.poulpopass.app.utils.Icons;
 import fr.poulpocorp.poulpopass.app.utils.Utils;
 import fr.poulpocorp.poulpopass.core.Category;
 import fr.poulpocorp.poulpopass.core.IPasswordManager;
-import fr.poulpocorp.poulpopass.core.Password;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
@@ -20,19 +19,15 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EditPasswordDialog extends JDialog {
 
-    /**
-     * @return {@link PasswordEvent} if the given password has been modified, otherwise {@code null}
-     */
-    public static PasswordEvent showDialog(Frame parent, Password password) {
-        EditPasswordDialog dialog = new EditPasswordDialog(parent, password);
-
-        return dialog.event;
+    public static void showDialog(Frame parent, PasswordModel model) {
+        new EditPasswordDialog(parent, model);
     }
 
-    private final Password password;
+    private final PasswordModel model;
 
     private JScrollPane scrollPane;
     private JPanel content;
@@ -46,12 +41,10 @@ public class EditPasswordDialog extends JDialog {
 
     private JPanel bottomPanel;
 
-    private PasswordEvent event = null;
-
-    private EditPasswordDialog(Frame parent, Password password) {
+    private EditPasswordDialog(Frame parent, PasswordModel model) {
         super(parent, "Edit password", true);
 
-        this.password = password;
+        this.model = model;
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -100,13 +93,13 @@ public class EditPasswordDialog extends JDialog {
 
         nameLabel.setForeground(titleLabelColor);
 
-        nameField = new JTextField(password.getName());
+        nameField = new JTextField(model.getName());
 
         // Password
         JLabel passwordLabel = new JLabel("Password");
         passwordLabel.setForeground(titleLabelColor);
 
-        passwordField = Utils.createPasswordTextField(password.getPassword());
+        passwordField = Utils.createPasswordTextField(model.getPassword());
 
         // Urls
         newUrlPanel = new JPanel();
@@ -122,11 +115,11 @@ public class EditPasswordDialog extends JDialog {
 
         // Categories
         categories = new JTagComponent();
-        for (Category category : password.getPasswordManager().getCategories()) {
+        for (Category category : model.getPasswordManager().getCategories()) {
             categories.addTagToComboBox(category.getName());
         }
-        for (Category category : password.getCategories()) {
-            categories.addTagToList(category.getName());
+        for (Category category : model.getCategories()) {
+            categories.moveTag(category.getName());
         }
 
         // Bottom panel
@@ -161,7 +154,7 @@ public class EditPasswordDialog extends JDialog {
         content.add(urlLabel, constraint);
 
         constraint.fillXAxis = true;
-        for (String url : password.getURLs()) {
+        for (String url : model.getURLs()) {
             PPTextField field = createURLField(url);
 
             content.add(field, constraint);
@@ -223,8 +216,6 @@ public class EditPasswordDialog extends JDialog {
         content.add(field, constraint, index);
         content.revalidate();
         content.repaint();
-
-        urlFields.add(field);
     }
 
     private void removeURL(PPTextField urlField) {
@@ -237,58 +228,43 @@ public class EditPasswordDialog extends JDialog {
 
     // TODO: Check if the user has modified the password
     private void save(ActionEvent e) {
-        IPasswordManager manager = password.getPasswordManager();
+        IPasswordManager manager = model.getPasswordManager();
 
-        boolean passwordNameChanged = !nameField.getText().equals(password.getName());
+        boolean passwordNameChanged = !nameField.getText().equals(model.getName());
 
         if (passwordNameChanged && manager.containsPasswordWithName(nameField.getText())) {
             // no
             nameField.putClientProperty(FlatClientProperties.OUTLINE, FlatClientProperties.OUTLINE_ERROR);
             repaint();
         } else {
-            int type = 0;
+            model.edit();
 
-            if (password.setName(nameField.getText())) {
-                type = PasswordEvent.NAME;
+            model.setName(nameField.getText());
+
+            if (!Arrays.equals(passwordField.getPassword(), model.getPassword())) {
+                model.setPassword(passwordField.getPassword());
             }
 
-            if (!Arrays.equals(passwordField.getPassword(), password.getPassword())) {
-                password.setPassword(passwordField.getPassword());
-
-                type |= PasswordEvent.PASSWORD;
-            }
-
-            String[] urls = urlFields.stream()
+            List<String> urls = urlFields.stream()
                     .map(JTextComponent::getText)
                     .filter((s) -> !s.isEmpty())
-                    .toArray(String[]::new);
+                    .collect(Collectors.toList());
 
-            if (!Arrays.equals(password.getURLs(), urls)) {
-                password.setURLs(urls);
-
-                type |= PasswordEvent.URLS;
+            if (!urls.equals(model.getURLs())) {
+                model.setURLs(urls);
             }
 
-            boolean modified = false;
             for (Tag tag : categories.getTags()) {
                 Category category = manager.getOrCreateCategory(tag.getName());
 
-                boolean result;
                 if (tag.isSelected()) {
-                    result = password.associateWith(category);
+                    model.associateWith(category);
                 } else {
-                    result = password.dissociateWith(category);
-                }
-
-                if (!modified && result) {
-                    modified = true;
-
-                    type |= PasswordEvent.ASSOCIATION;
+                    model.dissociateWith(category);
                 }
             }
-            if (type > 0) {
-                event = new PasswordEvent(password, type);
 
+            if (model.finishEdit()) {
                 dispose();
             }
         }
