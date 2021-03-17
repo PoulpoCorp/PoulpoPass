@@ -2,6 +2,7 @@ package fr.poulpocorp.poulpopass.app.model;
 
 import java.util.EventListener;
 
+import static fr.poulpocorp.poulpopass.app.model.CategoryEvent.ASSOCIATION_NAME;
 import static fr.poulpocorp.poulpopass.app.model.PasswordEvent.*;
 
 public interface PasswordEditedListener extends EventListener {
@@ -21,6 +22,9 @@ public interface PasswordEditedListener extends EventListener {
         if ((type & ASSOCIATION) != 0) {
             associationsChanged(event);
         }
+        if (((type) & ASSOCIATION_NAME) != 0) {
+            associationNameChanged(event);
+        }
     }
 
     void nameChanged(PasswordEvent event);
@@ -30,4 +34,11 @@ public interface PasswordEditedListener extends EventListener {
     void urlsChanged(PasswordEvent event);
 
     void associationsChanged(PasswordEvent event);
+
+    /**
+     * Invoked when a category associate with a password changes his name.
+     * Therefore, this is the {@link PasswordModel} class which call
+     * this method
+     */
+    void associationNameChanged(PasswordEvent event);
 }

@@ -35,6 +35,12 @@ public class CategoryModel extends Model {
 
     public boolean setName(String name) {
         if (category.setName(name)) {
+            PasswordEvent e = new PasswordEvent(this);
+
+            for (PasswordModel model : passwords) {
+                model.fireListener(PasswordEditedListener.class, (l) -> l.associationNameChanged(e));
+            }
+
             if (isEditing) {
                 type |= NAME;
             } else {

@@ -16,10 +16,10 @@ public class CategoryEvent extends EventObject {
         this.type = type;
     }
 
-    public CategoryEvent(PasswordModel source, int type) {
+    public CategoryEvent(PasswordModel source) {
         super(source);
 
-        this.type = type;
+        this.type = ASSOCIATION_NAME;
     }
 
     public int getType() {

@@ -1,10 +1,7 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
-import fr.poulpocorp.poulpopass.app.model.CategoryModel;
-import fr.poulpocorp.poulpopass.app.model.PasswordEditedListener;
-import fr.poulpocorp.poulpopass.app.model.PasswordEvent;
-import fr.poulpocorp.poulpopass.app.model.PasswordModel;
+import fr.poulpocorp.poulpopass.app.model.*;
 import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
 import fr.poulpocorp.poulpopass.app.tag.Tag;
 import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;
@@ -225,5 +222,16 @@ public class PasswordViewer extends AbstractViewer implements PasswordEditedList
 
         revalidate();
         repaint();
+    }
+
+    @Override
+    public void associationNameChanged(PasswordEvent event) {
+        List<CategoryModel> models = model.getCategories();
+
+        for (int i = 0; i < models.size(); i++) {
+            CategoryModel category = models.get(i);
+
+            categories.getTagAt(i).setName(category.getName());
+        }
     }
 }

@@ -2,8 +2,7 @@ package fr.poulpocorp.poulpopass.app.model;
 
 import java.util.EventListener;
 
-import static fr.poulpocorp.poulpopass.app.model.CategoryEvent.ASSOCIATION;
-import static fr.poulpocorp.poulpopass.app.model.CategoryEvent.NAME;
+import static fr.poulpocorp.poulpopass.app.model.CategoryEvent.*;
 
 public interface CategoryEditedListener extends EventListener {
 
@@ -16,6 +15,10 @@ public interface CategoryEditedListener extends EventListener {
 
         if ((type & ASSOCIATION) != 0) {
             associationsChanged(event);
+        }
+
+        if (((type) & ASSOCIATION_NAME) != 0) {
+            associationNameChanged(event);
         }
     }
 

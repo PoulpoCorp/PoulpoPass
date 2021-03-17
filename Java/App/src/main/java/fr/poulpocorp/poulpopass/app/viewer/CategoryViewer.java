@@ -123,9 +123,10 @@ public class CategoryViewer extends AbstractViewer implements CategoryEditedList
 
     @Override
     public void associationNameChanged(CategoryEvent event) {
-        List<PasswordModel> modelPasswords = model.getPasswords();
-        for (int i = 0; i < modelPasswords.size(); i++) {
-            PasswordModel password = modelPasswords.get(i);
+        List<PasswordModel> models = model.getPasswords();
+
+        for (int i = 0; i < models.size(); i++) {
+            PasswordModel password = models.get(i);
 
             passwords.getTagAt(i).setName(password.getName());
         }
