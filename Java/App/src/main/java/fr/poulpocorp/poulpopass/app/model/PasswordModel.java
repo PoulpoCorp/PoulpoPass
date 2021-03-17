@@ -32,6 +32,12 @@ public class PasswordModel extends Model {
 
     public boolean setName(String name) {
         if (password.setName(name)) {
+            CategoryEvent e = new CategoryEvent(this, CategoryEvent.ASSOCIATION_NAME);
+
+            for (CategoryModel model : categories) {
+                model.fireListener(CategoryEditedListener.class, (l) -> l.associationNameChanged(e));
+            }
+
             if (isEditing) {
                 type |= NAME;
             } else {
@@ -73,6 +79,7 @@ public class PasswordModel extends Model {
     public boolean associateWith(CategoryModel category) {
         if (password.associateWith(category.getCategoryInstance())) {
             categories.add(category);
+            category.notifyAssociation(this);
 
             if (isEditing) {
                 type |= ASSOCIATION;
@@ -88,9 +95,22 @@ public class PasswordModel extends Model {
         return false;
     }
 
+    void notifyAssociation(CategoryModel category) {
+        categories.add(category);
+
+        if (isEditing) {
+            type |= ASSOCIATION;
+        } else {
+            PasswordEvent event = new PasswordEvent(password, ASSOCIATION);
+
+            fireListener(PasswordEditedListener.class, (l) -> l.associationsChanged(event));
+        }
+    }
+
     public boolean dissociateWith(CategoryModel category) {
         if (password.dissociateWith(category.getCategoryInstance())) {
             categories.remove(category);
+            category.notifyDissociation(this);
 
             if (isEditing) {
                 type |= ASSOCIATION;
@@ -104,6 +124,18 @@ public class PasswordModel extends Model {
         }
 
         return false;
+    }
+
+    void notifyDissociation(CategoryModel category) {
+        categories.remove(category);
+
+        if (isEditing) {
+            type |= ASSOCIATION;
+        } else {
+            PasswordEvent event = new PasswordEvent(password, ASSOCIATION);
+
+            fireListener(PasswordEditedListener.class, (l) -> l.associationsChanged(event));
+        }
     }
 
     public List<CategoryModel> getCategories() {

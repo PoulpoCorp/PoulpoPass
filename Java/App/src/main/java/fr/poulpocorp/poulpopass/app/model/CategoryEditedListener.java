@@ -22,4 +22,11 @@ public interface CategoryEditedListener extends EventListener {
     void nameChanged(CategoryEvent event);
 
     void associationsChanged(CategoryEvent event);
+
+    /**
+     * Invoked when a password associate with a category changes his name.
+     * Therefore, this is the {@link PasswordModel} class which call
+     * this method
+     */
+    void associationNameChanged(CategoryEvent event);
 }

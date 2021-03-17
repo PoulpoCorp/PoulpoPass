@@ -1,6 +1,8 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
+import fr.poulpocorp.poulpopass.app.model.CategoryEditedListener;
+import fr.poulpocorp.poulpopass.app.model.CategoryEvent;
 import fr.poulpocorp.poulpopass.app.model.CategoryModel;
 import fr.poulpocorp.poulpopass.app.model.PasswordModel;
 import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
@@ -12,8 +14,9 @@ import fr.poulpocorp.poulpopass.core.Password;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
-public class CategoryViewer extends AbstractViewer {
+public class CategoryViewer extends AbstractViewer implements CategoryEditedListener {
 
     private CategoryModel model;
 
@@ -25,6 +28,8 @@ public class CategoryViewer extends AbstractViewer {
         this.model = model;
 
         initComponents();
+
+        model.addCategoryEditedListener(this);
     }
 
     @Override
@@ -65,7 +70,13 @@ public class CategoryViewer extends AbstractViewer {
         add(passwords, constraint);
     }
 
-    protected void updateViewer() {
+    @Override
+    public void nameChanged(CategoryEvent event) {
+        nameLabel.setText(model.getName());
+    }
+
+    @Override
+    public void associationsChanged(CategoryEvent event) {
         PasswordModel[] pass = model.getPasswords().toArray(new PasswordModel[0]);;
 
         Tag[] selected = passwords.getSelectedTags();
@@ -98,6 +109,16 @@ public class CategoryViewer extends AbstractViewer {
 
         revalidate();
         repaint();
+    }
+
+    @Override
+    public void associationNameChanged(CategoryEvent event) {
+        List<PasswordModel> modelPasswords = model.getPasswords();
+        for (int i = 0; i < modelPasswords.size(); i++) {
+            PasswordModel password = modelPasswords.get(i);
+
+            passwords.getTagAt(i).setName(password.getName());
+        }
     }
 
     @Override

@@ -53,9 +53,10 @@ public class CategoryModel extends Model {
         return category.getName();
     }
 
-    public boolean associateWith(PasswordModel model) {
-        if (category.associateWith(model.getPasswordInstance())) {
-            passwords.add(model);
+    public boolean associateWith(PasswordModel password) {
+        if (category.associateWith(password.getPasswordInstance())) {
+            passwords.add(password);
+            password.notifyAssociation(this);
 
             if (isEditing) {
                 type |= ASSOCIATION;
@@ -71,9 +72,23 @@ public class CategoryModel extends Model {
         return false;
     }
 
-    public boolean dissociateWith(PasswordModel model) {
-        if (category.dissociateWith(model.getPasswordInstance())) {
-            passwords.remove(model);
+    void notifyAssociation(PasswordModel password) {
+        passwords.add(password);
+
+        if (isEditing) {
+            type |= ASSOCIATION;
+        } else {
+            CategoryEvent event = new CategoryEvent(this, ASSOCIATION);
+
+            fireListener(CategoryEditedListener.class, (l) -> l.associationsChanged(event));
+        }
+
+    }
+
+    public boolean dissociateWith(PasswordModel password) {
+        if (category.dissociateWith(password.getPasswordInstance())) {
+            passwords.remove(password);
+            password.notifyAssociation(this);
 
             if (isEditing) {
                 type |= ASSOCIATION;
@@ -87,6 +102,18 @@ public class CategoryModel extends Model {
         }
 
         return false;
+    }
+
+    void notifyDissociation(PasswordModel password) {
+        passwords.remove(password);
+
+        if (isEditing) {
+            type |= ASSOCIATION;
+        } else {
+            CategoryEvent event = new CategoryEvent(this, ASSOCIATION);
+
+            fireListener(CategoryEditedListener.class, (l) -> l.associationsChanged(event));
+        }
     }
 
     public List<PasswordModel> getPasswords() {
