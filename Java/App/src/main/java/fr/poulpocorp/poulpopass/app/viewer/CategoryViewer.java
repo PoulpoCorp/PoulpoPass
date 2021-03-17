@@ -1,6 +1,8 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
+import fr.poulpocorp.poulpopass.app.model.CategoryModel;
+import fr.poulpocorp.poulpopass.app.model.PasswordModel;
 import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
 import fr.poulpocorp.poulpopass.app.tag.Tag;
 import fr.poulpocorp.poulpopass.app.utils.Icons;
@@ -13,14 +15,14 @@ import java.awt.*;
 
 public class CategoryViewer extends AbstractViewer {
 
-    private Category category;
+    private CategoryModel model;
 
     private JLabel nameLabel;
     private JTagComponent passwords;
 
-    public CategoryViewer(PasswordExplorer explorer, Category category) {
+    public CategoryViewer(PasswordExplorer explorer, CategoryModel model) {
         super(explorer);
-        this.category = category;
+        this.model = model;
 
         initComponents();
     }
@@ -28,7 +30,7 @@ public class CategoryViewer extends AbstractViewer {
     @Override
     protected Component getTopComponent() {
         if (nameLabel == null) {
-            nameLabel = new JLabel(category.getName());
+            nameLabel = new JLabel(model.getName());
             nameLabel.setForeground(Utils.applyThemeColorFunction(nameLabel.getForeground()));
         }
 
@@ -52,7 +54,7 @@ public class CategoryViewer extends AbstractViewer {
         passwords = new JTagComponent();
         passwords.setEditable(false);
 
-        for (Password password : category.getPasswords()) {
+        for (PasswordModel password : model.getPasswords()) {
             Tag tag = passwords.addTagToList(password.getName());
 
             tag.addActionListener((e) -> explorer.highlightPassword(password));
@@ -64,13 +66,13 @@ public class CategoryViewer extends AbstractViewer {
     }
 
     protected void updateViewer() {
-        Password[] pass = category.getPasswords().toArray(new Password[0]);;
+        PasswordModel[] pass = model.getPasswords().toArray(new PasswordModel[0]);;
 
         Tag[] selected = passwords.getSelectedTags();
 
         int i;
         for (i = 0; i < pass.length; i++) {
-            Password password = pass[i];
+            PasswordModel password = pass[i];
 
             // modify
             if (i < selected.length) {

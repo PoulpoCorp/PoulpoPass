@@ -3,6 +3,7 @@ package fr.poulpocorp.poulpopass.app.viewer;
 import com.formdev.flatlaf.FlatClientProperties;
 import fr.poulpocorp.poulpopass.app.layout.VCOrientation;
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
+import fr.poulpocorp.poulpopass.app.model.CategoryModel;
 import fr.poulpocorp.poulpopass.app.model.PasswordEditedListener;
 import fr.poulpocorp.poulpopass.app.model.PasswordEvent;
 import fr.poulpocorp.poulpopass.app.model.PasswordModel;
@@ -115,7 +116,7 @@ public class PasswordViewer extends AbstractViewer implements PasswordEditedList
         categories = new JTagComponent();
         categories.setEditable(false);
 
-        for (Category category : model.getCategories()) {
+        for (CategoryModel category : model.getCategories()) {
             Tag tag = categories.addTagToList(category.getName());
 
             tag.addActionListener((e) -> explorer.highlightCategory(category));
@@ -164,7 +165,7 @@ public class PasswordViewer extends AbstractViewer implements PasswordEditedList
         List<String> urls = model.getURLs();
 
         // If the first url has changed, we need to update the icon
-        if (urlLabels.size() > 0) {
+        if (urls.size() > 0) {
             String oldFirstUrl = urlLabels.get(0).getText();
 
             String first = urls.get(0);
@@ -207,12 +208,28 @@ public class PasswordViewer extends AbstractViewer implements PasswordEditedList
 
     @Override
     public void associationsChanged(PasswordEvent event) {
-        categories.removeAllTags();
+        int i = 0;
 
-        for (Category category : model.getCategories()) {
-            Tag tag = categories.addTagToList(category.getName());
+        List<CategoryModel> models = model.getCategories();
+        Tag[] tags = categories.getSelectedTags();
 
-            tag.addActionListener((e) -> explorer.highlightCategory(category));
+        int length = Math.min(models.size(), tags.length);
+
+        for (; i < length; i++) {
+            Tag tag = categories.getTagInListAt(i);
+
+            tag.setName(models.get(i).getName());
+        }
+
+        if (models.size() > length) { // add
+            for (; i < models.size(); i++) {
+                categories.addTagToList(models.get(i).getName());
+            }
+        } else { // remove
+            while (i < categories.length()) {
+                categories.removeTagInListAt(i);
+            }
+
         }
 
         revalidate();

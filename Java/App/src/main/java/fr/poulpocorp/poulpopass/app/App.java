@@ -1,5 +1,6 @@
 package fr.poulpocorp.poulpopass.app;
 
+import fr.poulpocorp.poulpopass.app.model.PasswordManagerModel;
 import fr.poulpocorp.poulpopass.app.viewer.PasswordExplorer;
 import fr.poulpocorp.poulpopass.core.Category;
 import fr.poulpocorp.poulpopass.core.Password;
@@ -58,7 +59,7 @@ public class App extends JFrame  {
         Password openGL = manager.getOrCreatePassword("OpenGL tutorial", "opengl tutorial".toCharArray());
         openGL.addURL("http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/");
 
-        PasswordExplorer explorer = new PasswordExplorer(manager);
+        PasswordExplorer explorer = new PasswordExplorer(new PasswordManagerModel(manager));
         explorer.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         add(explorer);

@@ -169,6 +169,21 @@ public class JTagComponent extends JComponent implements TagModel {
     }
 
     @Override
+    public int selected() {
+        return model.selected();
+    }
+
+    @Override
+    public int notSelected() {
+        return model.notSelected();
+    }
+
+    @Override
+    public int length() {
+        return model.length();
+    }
+
+    @Override
     public void addTagListener(TagListener listener) {
         model.addTagListener(listener);
     }

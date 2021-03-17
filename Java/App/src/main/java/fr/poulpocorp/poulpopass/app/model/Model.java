@@ -6,7 +6,7 @@ import java.beans.PropertyChangeSupport;
 import java.util.EventListener;
 import java.util.function.Consumer;
 
-public class Model {
+public abstract class Model {
 
     protected final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
     protected final EventListenerList listenerList = new EventListenerList();

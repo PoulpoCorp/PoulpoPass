@@ -44,6 +44,12 @@ public interface TagModel {
 
     Tag[] getNotSelectedTags();
 
+    int selected();
+
+    int notSelected();
+
+    int length();
+
     void addTagListener(TagListener listener);
 
     void removeTagListener(TagListener listener);

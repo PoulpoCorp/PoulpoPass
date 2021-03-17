@@ -2,6 +2,8 @@ package fr.poulpocorp.poulpopass.app.viewer;
 
 import com.formdev.flatlaf.FlatClientProperties;
 import fr.poulpocorp.poulpopass.app.layout.*;
+import fr.poulpocorp.poulpopass.app.model.CategoryModel;
+import fr.poulpocorp.poulpopass.app.model.PasswordManagerModel;
 import fr.poulpocorp.poulpopass.app.model.PasswordModel;
 import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
 import fr.poulpocorp.poulpopass.app.tag.Tag;
@@ -73,6 +75,7 @@ public class EditPasswordDialog extends JDialog {
      *             -> JPanel newUrlPanel with HorizontalLayout
      *                  -> JLabel "New Url"
      *                  -> JButton newUrlButton
+     *             -> JTagComponent categories
      *   -> JPanel bottomPanel with HorizontalLayout
      *        -> JButton saveButton (at right)
      */
@@ -115,10 +118,10 @@ public class EditPasswordDialog extends JDialog {
 
         // Categories
         categories = new JTagComponent();
-        for (Category category : model.getPasswordManager().getCategories()) {
+        for (CategoryModel category : model.getPasswordManager().getCategories()) {
             categories.addTagToComboBox(category.getName());
         }
-        for (Category category : model.getCategories()) {
+        for (CategoryModel category : model.getCategories()) {
             categories.moveTag(category.getName());
         }
 
@@ -228,7 +231,7 @@ public class EditPasswordDialog extends JDialog {
 
     // TODO: Check if the user has modified the password
     private void save(ActionEvent e) {
-        IPasswordManager manager = model.getPasswordManager();
+        PasswordManagerModel manager = model.getPasswordManager();
 
         boolean passwordNameChanged = !nameField.getText().equals(model.getName());
 
@@ -255,7 +258,7 @@ public class EditPasswordDialog extends JDialog {
             }
 
             for (Tag tag : categories.getTags()) {
-                Category category = manager.getOrCreateCategory(tag.getName());
+                CategoryModel category = manager.getOrCreateCategory(tag.getName());
 
                 if (tag.isSelected()) {
                     model.associateWith(category);

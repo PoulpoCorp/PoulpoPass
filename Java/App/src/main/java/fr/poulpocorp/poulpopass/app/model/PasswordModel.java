@@ -1,28 +1,35 @@
 package fr.poulpocorp.poulpopass.app.model;
 
 import fr.poulpocorp.poulpopass.core.Category;
-import fr.poulpocorp.poulpopass.core.IPassword;
-import fr.poulpocorp.poulpopass.core.IPasswordManager;
 import fr.poulpocorp.poulpopass.core.Password;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static fr.poulpocorp.poulpopass.app.model.PasswordEvent.*;
 
-public class PasswordModel extends Model implements IPassword {
+public class PasswordModel extends Model {
 
-    private Password password;
+    private final PasswordManagerModel manager;
+    private final Password password;
+
+    private final List<CategoryModel> categories;
 
     private boolean isEditing = false;
     private int type = 0;
 
-    public PasswordModel(Password password) {
+    public PasswordModel(PasswordManagerModel manager, Password password) {
+        this.manager = manager;
         this.password = password;
+
+        categories = new ArrayList<>();
     }
 
-    @Override
+    void createAssociations() {
+        for (Category category : password.getCategories()) {
+            categories.add(manager.get(category));
+        }
+    }
+
     public boolean setName(String name) {
         if (password.setName(name)) {
             if (isEditing) {
@@ -39,12 +46,10 @@ public class PasswordModel extends Model implements IPassword {
         return false;
     }
 
-    @Override
     public String getName() {
         return password.getName();
     }
 
-    @Override
     public boolean setPassword(char[] pass) {
         if (password.setPassword(pass)) {
             if (isEditing) {
@@ -61,14 +66,14 @@ public class PasswordModel extends Model implements IPassword {
         return false;
     }
 
-    @Override
     public char[] getPassword() {
         return password.getPassword();
     }
 
-    @Override
-    public boolean associateWith(Category category) {
-        if (password.associateWith(category)) {
+    public boolean associateWith(CategoryModel category) {
+        if (password.associateWith(category.getCategoryInstance())) {
+            categories.add(category);
+
             if (isEditing) {
                 type |= ASSOCIATION;
             } else {
@@ -83,9 +88,10 @@ public class PasswordModel extends Model implements IPassword {
         return false;
     }
 
-    @Override
-    public boolean dissociateWith(Category category) {
-        if (password.dissociateWith(category)) {
+    public boolean dissociateWith(CategoryModel category) {
+        if (password.dissociateWith(category.getCategoryInstance())) {
+            categories.remove(category);
+
             if (isEditing) {
                 type |= ASSOCIATION;
             } else {
@@ -100,17 +106,14 @@ public class PasswordModel extends Model implements IPassword {
         return false;
     }
 
-    @Override
-    public Set<Category> getCategories() {
-        return password.getCategories();
+    public List<CategoryModel> getCategories() {
+        return Collections.unmodifiableList(categories);
     }
 
-    @Override
     public int getNumberOfCategories() {
         return password.getNumberOfCategories();
     }
 
-    @Override
     public void addURL(String url) {
         password.addURL(url);
 
@@ -123,7 +126,6 @@ public class PasswordModel extends Model implements IPassword {
         }
     }
 
-    @Override
     public void addURL(int index, String url) {
         password.addURL(index, url);
 
@@ -136,7 +138,6 @@ public class PasswordModel extends Model implements IPassword {
         }
     }
 
-    @Override
     public void setURL(int index, String url) {
         password.setURL(index, url);
 
@@ -149,7 +150,6 @@ public class PasswordModel extends Model implements IPassword {
         }
     }
 
-    @Override
     public boolean removeURL(String url) {
         if (password.removeURL(url)) {
             if (isEditing) {
@@ -166,7 +166,6 @@ public class PasswordModel extends Model implements IPassword {
         return false;
     }
 
-    @Override
     public void removeURL(int index) {
         password.removeURL(index);
 
@@ -179,7 +178,6 @@ public class PasswordModel extends Model implements IPassword {
         }
     }
 
-    @Override
     public void removeAllURL() {
         password.removeAllURL();
 
@@ -192,7 +190,6 @@ public class PasswordModel extends Model implements IPassword {
         }
     }
 
-    @Override
     public void addAll(Collection<? extends String> c) {
         password.addAll(c);
 
@@ -205,7 +202,6 @@ public class PasswordModel extends Model implements IPassword {
         }
     }
 
-    @Override
     public void setURLs(String[] urls) {
         password.setURLs(urls);
 
@@ -218,7 +214,6 @@ public class PasswordModel extends Model implements IPassword {
         }
     }
 
-    @Override
     public void setURLs(List<String> urls) {
         password.setURLs(urls);
 
@@ -231,18 +226,20 @@ public class PasswordModel extends Model implements IPassword {
         }
     }
 
-    @Override
     public List<String> getURLs() {
         return password.getURLs();
     }
 
-    @Override
     public int getNumberOfURL() {
         return password.getNumberOfURL();
     }
 
-    public IPasswordManager getPasswordManager() {
-        return password.getPasswordManager();
+    public PasswordManagerModel getPasswordManager() {
+        return manager;
+    }
+
+    Password getPasswordInstance() {
+        return password;
     }
 
     public void edit() {

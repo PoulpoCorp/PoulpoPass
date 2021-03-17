@@ -218,6 +218,21 @@ public class DefaultTagModel implements TagModel {
         return elements.getFirst().toArray(new Tag[0]);
     }
 
+    @Override
+    public int selected() {
+        return elements.getSecond().size();
+    }
+
+    @Override
+    public int notSelected() {
+        return elements.getFirst().size();
+    }
+
+    @Override
+    public int length() {
+        return elements.size();
+    }
+
     protected void fireTagListeners(Tag tag, int type) {
         TagListener[] listeners = listenerList.getListeners(TagListener.class);
 

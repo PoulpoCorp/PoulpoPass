@@ -1,9 +1,6 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
-import fr.poulpocorp.poulpopass.app.model.PasswordEditedAdapter;
-import fr.poulpocorp.poulpopass.app.model.PasswordEditedListener;
-import fr.poulpocorp.poulpopass.app.model.PasswordEvent;
-import fr.poulpocorp.poulpopass.app.model.PasswordModel;
+import fr.poulpocorp.poulpopass.app.model.*;
 import fr.poulpocorp.poulpopass.core.Category;
 import fr.poulpocorp.poulpopass.core.Password;
 import fr.poulpocorp.poulpopass.core.PasswordManager;
@@ -13,12 +10,12 @@ import java.util.HashMap;
 
 public class PasswordExplorer extends JPanel {
 
-    private PasswordManager manager;
+    private final PasswordManagerModel manager;
 
     private final HashMap<PasswordModel, PasswordViewer> passwordMap = new HashMap<>();
-    private final HashMap<Category, CategoryViewer> categoryMap = new HashMap<>();
+    private final HashMap<CategoryModel, CategoryViewer> categoryMap = new HashMap<>();
 
-    public PasswordExplorer(PasswordManager manager) {
+    public PasswordExplorer(PasswordManagerModel manager) {
         this.manager = manager;
 
         initComponents();
@@ -27,22 +24,20 @@ public class PasswordExplorer extends JPanel {
     private void initComponents() {
         setLayout(new PasswordExplorerLayout());
 
-        for (Category category : manager.getCategories()) {
-            CategoryViewer viewer = new CategoryViewer(this, category);
+        for (CategoryModel model : manager.getCategories()) {
+            CategoryViewer viewer = new CategoryViewer(this, model);
 
             add(viewer);
-            categoryMap.put(category, viewer);
+            categoryMap.put(model, viewer);
         }
 
-        for (Password password : manager.getPasswords()) {
-            PasswordModel model = new PasswordModel(password);
-
+        for (PasswordModel model : manager.getPasswords()) {
             PasswordViewer viewer = new PasswordViewer(this, model);
 
             add(viewer);
             passwordMap.put(model, viewer);
 
-            model.addPasswordEditedListener(new PasswordEditedAdapter() {
+            /*model.addPasswordEditedListener(new PasswordEditedAdapter() {
                 @Override
                 public void passwordEdited(PasswordEvent event) {
                     int type = event.getType();
@@ -64,17 +59,17 @@ public class PasswordExplorer extends JPanel {
                 public void associationsChanged(PasswordEvent event) {
                     passwordEdited(event);
                 }
-            });
+            });*/
         }
     }
 
-    public void highlightPassword(Password password) {
+    public void highlightPassword(PasswordModel password) {
         PasswordViewer comp = passwordMap.get(password);
 
         ViewerBorder.startAnimation(comp, comp.getViewerBorder());
     }
 
-    public void highlightCategory(Category category) {
+    public void highlightCategory(CategoryModel category) {
         CategoryViewer comp = categoryMap.get(category);
 
         ViewerBorder.startAnimation(comp, comp.getViewerBorder());
