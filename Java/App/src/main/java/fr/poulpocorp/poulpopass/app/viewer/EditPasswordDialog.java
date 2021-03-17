@@ -1,18 +1,16 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
 import com.formdev.flatlaf.FlatClientProperties;
-import fr.poulpocorp.poulpopass.app.layout.*;
+import fr.poulpocorp.poulpopass.app.layout.HorizontalLayout;
+import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
 import fr.poulpocorp.poulpopass.app.model.CategoryModel;
 import fr.poulpocorp.poulpopass.app.model.PasswordManagerModel;
 import fr.poulpocorp.poulpopass.app.model.PasswordModel;
-import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
 import fr.poulpocorp.poulpopass.app.tag.Tag;
 import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;
 import fr.poulpocorp.poulpopass.app.text.PPTextField;
 import fr.poulpocorp.poulpopass.app.utils.Icons;
 import fr.poulpocorp.poulpopass.app.utils.Utils;
-import fr.poulpocorp.poulpopass.core.Category;
-import fr.poulpocorp.poulpopass.core.IPasswordManager;
 
 import javax.swing.*;
 import javax.swing.text.JTextComponent;
@@ -23,81 +21,50 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EditPasswordDialog extends JDialog {
+/**
+ * Layout description
+ *
+ * JPanel mainContent with BorderLayout
+ *   -> JScrollPane scrollPane
+ *        -> JPanel content with VerticalLayout
+ *             -> JLabel "Name"
+ *             -> PPTextField nameField
+ *             -> Separator
+ *             -> JLabel "Password"
+ *             -> PPPasswordTextField passwordField
+ *             -> JLabel "Urls"
+ *             -> PPTextField url1
+ *             -> ...
+ *             -> PPTextField urlN
+ *             -> JPanel newUrlPanel with HorizontalLayout
+ *                  -> JLabel "New Url"
+ *                  -> JButton newUrlButton
+ *             -> JTagComponent categories
+ *   -> JPanel bottomPanel with HorizontalLayout
+ *        -> JButton saveButton (at right)
+ */
+public class EditPasswordDialog extends AbstractEditDialog<PasswordModel> {
 
     public static void showDialog(Frame parent, PasswordModel model) {
         new EditPasswordDialog(parent, model);
     }
 
-    private final PasswordModel model;
-
-    private JScrollPane scrollPane;
-    private JPanel content;
-
-    private JTextField nameField;
     private PPPasswordTextField passwordField;
-    private final List<PPTextField> urlFields = new ArrayList<>();
-    private JTagComponent categories;
+    private List<PPTextField> urlFields;
 
     private JPanel newUrlPanel;
 
-    private JPanel bottomPanel;
-
     private EditPasswordDialog(Frame parent, PasswordModel model) {
-        super(parent, "Edit password", true);
-
-        this.model = model;
-
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
-        initComponents();
-
-        pack();
-        setLocationRelativeTo(parent);
-        setVisible(true);
+        super(parent, "Edit password", model);
     }
 
-    /**
-     * Layout description
-     *
-     * JPanel mainContent with BorderLayout
-     *   -> JScrollPane scrollPane
-     *        -> JPanel content with VerticalLayout
-     *             -> JLabel "Name"
-     *             -> PPTextField nameField
-     *             -> Separator
-     *             -> JLabel "Password"
-     *             -> PPPasswordTextField passwordField
-     *             -> JLabel "Urls"
-     *             -> PPTextField url1
-     *             -> ...
-     *             -> PPTextField urlN
-     *             -> JPanel newUrlPanel with HorizontalLayout
-     *                  -> JLabel "New Url"
-     *                  -> JButton newUrlButton
-     *             -> JTagComponent categories
-     *   -> JPanel bottomPanel with HorizontalLayout
-     *        -> JButton saveButton (at right)
-     */
-    private void initComponents() {
-        JPanel mainContent = new JPanel();
-        mainContent.setLayout(new BorderLayout());
+    @Override
+    protected String getModelName() {
+        return model.getName();
+    }
 
-        scrollPane = new JScrollPane();
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-        content = new JPanel();
-        content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        content.setLayout(new VerticalLayout(5, 5));
-
-        // Name
-        JLabel nameLabel = new JLabel("Name");
-        Color titleLabelColor = Utils.applyThemeColorFunction(nameLabel.getForeground());
-
-        nameLabel.setForeground(titleLabelColor);
-
-        nameField = new JTextField(model.getName());
-
+    @Override
+    protected void initFields(JPanel content, VerticalConstraint constraint, Color titleLabelColor) {
         // Password
         JLabel passwordLabel = new JLabel("Password");
         passwordLabel.setForeground(titleLabelColor);
@@ -116,36 +83,9 @@ public class EditPasswordDialog extends JDialog {
         newUrlButton.putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_TOOLBAR_BUTTON);
         newUrlButton.addActionListener(this::addURL);
 
-        // Categories
-        categories = new JTagComponent();
-        for (CategoryModel category : model.getPasswordManager().getCategories()) {
-            categories.addTagToComboBox(category.getName());
-        }
-        for (CategoryModel category : model.getCategories()) {
-            categories.moveTag(category.getName());
-        }
+        urlFields = new ArrayList<>();
 
-        // Bottom panel
-        bottomPanel = new JPanel();
-        bottomPanel.setLayout(new HorizontalLayout(3, 3));
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-
-        // Save
-        JButton save = new JButton(Icons.SAVE);
-        save.putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_TOOLBAR_BUTTON);
-        save.addActionListener(this::save);
-
-        // Content layout
-        VerticalConstraint constraint = new VerticalConstraint();
-
-        // name
-        constraint.xAlignment = 0;
-        content.add(nameLabel, constraint);
-        constraint.fillXAxis = true;
-        content.add(nameField, constraint);
-
-        content.add(new JSeparator());
-
+        // Layout
         // password
         constraint.fillXAxis = false;
         content.add(passwordLabel, constraint);
@@ -169,27 +109,16 @@ public class EditPasswordDialog extends JDialog {
         constraint.fillXAxis = false;
         constraint.xAlignment = 1;
         content.add(newUrlPanel, constraint);
+    }
 
-        constraint.xAlignment = 0;
-        constraint.endComponent = true;
-        content.add(categories, constraint);
-
-        scrollPane.setViewportView(content);
-
-        // Bottom layout
-        // Save button
-        HorizontalConstraint hConstraint = new HorizontalConstraint();
-        hConstraint.orientation = HCOrientation.RIGHT;
-
-        // Add in reverse order
-        bottomPanel.add(save, hConstraint);
-        bottomPanel.add(new JLabel("Save"), hConstraint);
-
-        // Finish layout
-        mainContent.add(scrollPane, BorderLayout.CENTER);
-        mainContent.add(bottomPanel, BorderLayout.SOUTH);
-
-        setContentPane(mainContent);
+    @Override
+    protected void fillAssociations() {
+        for (CategoryModel category : model.getPasswordManager().getCategories()) {
+            associations.addTagToComboBox(category.getName());
+        }
+        for (CategoryModel category : model.getCategories()) {
+            associations.moveTag(category.getName());
+        }
     }
 
     private PPTextField createURLField(String url) {
@@ -229,8 +158,8 @@ public class EditPasswordDialog extends JDialog {
         urlFields.remove(urlField);
     }
 
-    // TODO: Check if the user has modified the password
-    private void save(ActionEvent e) {
+    @Override
+    protected void save(ActionEvent e) {
         PasswordManagerModel manager = model.getPasswordManager();
 
         boolean passwordNameChanged = !nameField.getText().equals(model.getName());
@@ -257,8 +186,8 @@ public class EditPasswordDialog extends JDialog {
                 model.setURLs(urls);
             }
 
-            for (Tag tag : categories.getTags()) {
-                CategoryModel category = manager.getOrCreateCategory(tag.getName());
+            for (Tag tag : associations.getTags()) {
+                CategoryModel category = manager.getCategoryIfExists(tag.getName());
 
                 if (tag.isSelected()) {
                     model.associateWith(category);

@@ -9,11 +9,10 @@ import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
 import fr.poulpocorp.poulpopass.app.tag.Tag;
 import fr.poulpocorp.poulpopass.app.utils.Icons;
 import fr.poulpocorp.poulpopass.app.utils.Utils;
-import fr.poulpocorp.poulpopass.core.Category;
-import fr.poulpocorp.poulpopass.core.Password;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.List;
 
 public class CategoryViewer extends AbstractViewer implements CategoryEditedListener {
@@ -68,6 +67,17 @@ public class CategoryViewer extends AbstractViewer implements CategoryEditedList
         add(passwordsLabel, constraint);
         constraint.endComponent = true;
         add(passwords, constraint);
+    }
+
+    @Override
+    protected void edit(ActionEvent e) {
+        Window ancestor = SwingUtilities.getWindowAncestor(this);
+
+        if (ancestor instanceof Frame) {
+            EditCategoryDialog.showDialog((Frame) ancestor, model);
+        } else {
+            EditCategoryDialog.showDialog(null, model);
+        }
     }
 
     @Override

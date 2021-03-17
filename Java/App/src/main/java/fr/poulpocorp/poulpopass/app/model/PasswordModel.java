@@ -3,7 +3,10 @@ package fr.poulpocorp.poulpopass.app.model;
 import fr.poulpocorp.poulpopass.core.Category;
 import fr.poulpocorp.poulpopass.core.Password;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import static fr.poulpocorp.poulpopass.app.model.PasswordEvent.*;
 

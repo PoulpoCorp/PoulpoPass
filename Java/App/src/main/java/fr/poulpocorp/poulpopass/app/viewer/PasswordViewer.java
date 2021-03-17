@@ -1,7 +1,5 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
-import com.formdev.flatlaf.FlatClientProperties;
-import fr.poulpocorp.poulpopass.app.layout.VCOrientation;
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
 import fr.poulpocorp.poulpopass.app.model.CategoryModel;
 import fr.poulpocorp.poulpopass.app.model.PasswordEditedListener;
@@ -13,10 +11,10 @@ import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;
 import fr.poulpocorp.poulpopass.app.utils.FaviconFetcher;
 import fr.poulpocorp.poulpopass.app.utils.Icons;
 import fr.poulpocorp.poulpopass.app.utils.Utils;
-import fr.poulpocorp.poulpopass.core.Category;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -125,24 +123,17 @@ public class PasswordViewer extends AbstractViewer implements PasswordEditedList
         constraint.fillXAxis = true;
         constraint.endComponent = true;
         add(categories, constraint);
+    }
 
-        // edit button
-        JButton edit = new JButton(Icons.EDIT);
-        edit.putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_TOOLBAR_BUTTON);
-        edit.addActionListener((e) -> {
-            Window ancestor = SwingUtilities.getWindowAncestor(this);
+    @Override
+    protected void edit(ActionEvent e) {
+        Window ancestor = SwingUtilities.getWindowAncestor(this);
 
-            if (ancestor instanceof Frame) {
-                EditPasswordDialog.showDialog((Frame) ancestor, model);
-            } else {
-                EditPasswordDialog.showDialog(null, model);
-            }
-        });
-
-        constraint.fillXAxis = false;
-        constraint.orientation = VCOrientation.BOTTOM;
-        constraint.xAlignment = 1;
-        add(edit, constraint);
+        if (ancestor instanceof Frame) {
+            EditPasswordDialog.showDialog((Frame) ancestor, model);
+        } else {
+            EditPasswordDialog.showDialog(null, model);
+        }
     }
 
     @Override

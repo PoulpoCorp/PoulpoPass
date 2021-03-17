@@ -1,9 +1,8 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
-import fr.poulpocorp.poulpopass.app.model.*;
-import fr.poulpocorp.poulpopass.core.Category;
-import fr.poulpocorp.poulpopass.core.Password;
-import fr.poulpocorp.poulpopass.core.PasswordManager;
+import fr.poulpocorp.poulpopass.app.model.CategoryModel;
+import fr.poulpocorp.poulpopass.app.model.PasswordManagerModel;
+import fr.poulpocorp.poulpopass.app.model.PasswordModel;
 
 import javax.swing.*;
 import java.util.HashMap;
