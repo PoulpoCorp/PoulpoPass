@@ -1,7 +1,5 @@
 package fr.poulpocorp.poulpopass.app.model;
 
-import fr.poulpocorp.poulpopass.core.Password;
-
 import java.util.EventObject;
 
 public class PasswordEvent extends EventObject {

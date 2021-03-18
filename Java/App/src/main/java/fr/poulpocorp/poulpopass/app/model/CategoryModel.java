@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static fr.poulpocorp.poulpopass.app.model.PasswordEvent.ASSOCIATION;
-import static fr.poulpocorp.poulpopass.app.model.PasswordEvent.NAME;
+import static fr.poulpocorp.poulpopass.app.model.CategoryEvent.ASSOCIATION;
+import static fr.poulpocorp.poulpopass.app.model.CategoryEvent.NAME;
 
 public class CategoryModel extends Model {
 

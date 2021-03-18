@@ -1,7 +1,10 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
-import fr.poulpocorp.poulpopass.app.model.*;
+import fr.poulpocorp.poulpopass.app.model.CategoryModel;
+import fr.poulpocorp.poulpopass.app.model.PasswordEditedListener;
+import fr.poulpocorp.poulpopass.app.model.PasswordEvent;
+import fr.poulpocorp.poulpopass.app.model.PasswordModel;
 import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
 import fr.poulpocorp.poulpopass.app.tag.Tag;
 import fr.poulpocorp.poulpopass.app.text.PPPasswordTextField;

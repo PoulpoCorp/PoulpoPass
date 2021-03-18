@@ -87,34 +87,28 @@ public class CategoryViewer extends AbstractViewer implements CategoryEditedList
 
     @Override
     public void associationsChanged(CategoryEvent event) {
-        PasswordModel[] pass = model.getPasswords().toArray(new PasswordModel[0]);;
+        int i = 0;
 
-        Tag[] selected = passwords.getSelectedTags();
+        List<PasswordModel> models = model.getPasswords();
+        Tag[] tags = passwords.getSelectedTags();
 
-        int i;
-        for (i = 0; i < pass.length; i++) {
-            PasswordModel password = pass[i];
+        int length = Math.min(models.size(), tags.length);
 
-            // modify
-            if (i < selected.length) {
-                Tag tag = passwords.getTagInListAt(i);
+        for (; i < length; i++) {
+            Tag tag = passwords.getTagInListAt(i);
 
-                if (!tag.getName().equals(password.getName())) {
-                    tag.setName(password.getName());
-                }
-            } else {
-                // add
-                Tag tag = passwords.addTagToList(password.getName());
-
-                tag.addActionListener((e) -> explorer.highlightPassword(password));
-            }
+            tag.setName(models.get(i).getName());
         }
 
-        // remove
-        if (i < selected.length) {
-            for (; i < selected.length; i++) {
+        if (models.size() > length) { // add
+            for (; i < models.size(); i++) {
+                passwords.addTagToList(models.get(i).getName());
+            }
+        } else { // remove
+            while (i < passwords.length()) {
                 passwords.removeTagInListAt(i);
             }
+
         }
 
         revalidate();
