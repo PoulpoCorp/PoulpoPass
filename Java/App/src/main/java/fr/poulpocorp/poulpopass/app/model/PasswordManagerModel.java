@@ -10,6 +10,8 @@ import java.security.InvalidKeyException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
+import static fr.poulpocorp.poulpopass.app.model.CategoryEvent.ASSOCIATION_NAME;
+
 public class PasswordManagerModel extends Model {
 
     private final PasswordManager manager;
@@ -76,7 +78,7 @@ public class PasswordManagerModel extends Model {
 
             categories.put(category, model);
 
-            fireListener(PasswordManagerListener.class, (l) -> l.categoryCreated(this, model));
+            fireCategoryCreated(model);
 
             return model;
         } else {
@@ -94,7 +96,7 @@ public class PasswordManagerModel extends Model {
 
             passwords.put(pass, model);
 
-            fireListener(PasswordManagerListener.class, (l) -> l.passwordCreated(this, model));
+            firePasswordCreated(model);
 
             return model;
         } else {
@@ -132,7 +134,7 @@ public class PasswordManagerModel extends Model {
         if (manager.removePassword(password)) {
             passwords.remove(password, model);
 
-            fireListener(PasswordManagerListener.class, (l) -> l.passwordRemoved(this, model));
+            firePasswordRemoved(model);
 
             return true;
         }
@@ -146,7 +148,7 @@ public class PasswordManagerModel extends Model {
         if (manager.removeCategory(category)) {
             categories.remove(category, model);
 
-            fireListener(PasswordManagerListener.class, (l) -> l.categoryRemoved(this, model));
+           fireCategoryRemoved(model);
 
             return true;
         }
@@ -189,6 +191,50 @@ public class PasswordManagerModel extends Model {
 
     public void save() throws IOException, InvalidKeyException {
         throw new UnsupportedOperationException();
+    }
+
+    protected void firePasswordCreated(PasswordModel password) {
+        PasswordManagerListener[] listeners = getPasswordManagerListeners();
+        if (listeners.length == 0) {
+            return;
+        }
+
+        for (PasswordManagerListener listener : listeners) {
+            listener.passwordCreated(this, password);
+        }
+    }
+
+    protected void firePasswordRemoved(PasswordModel password) {
+        PasswordManagerListener[] listeners = getPasswordManagerListeners();
+        if (listeners.length == 0) {
+            return;
+        }
+
+        for (PasswordManagerListener listener : listeners) {
+            listener.passwordRemoved(this, password);
+        }
+    }
+
+    protected void fireCategoryCreated(CategoryModel category) {
+        PasswordManagerListener[] listeners = getPasswordManagerListeners();
+        if (listeners.length == 0) {
+            return;
+        }
+
+        for (PasswordManagerListener listener : listeners) {
+            listener.categoryCreated(this, category);
+        }
+    }
+
+    protected void fireCategoryRemoved(CategoryModel category) {
+        PasswordManagerListener[] listeners = getPasswordManagerListeners();
+        if (listeners.length == 0) {
+            return;
+        }
+
+        for (PasswordManagerListener listener : listeners) {
+            listener.categoryRemoved(this, category);
+        }
     }
 
     public void addPasswordManagerListener(PasswordManagerListener listener) {

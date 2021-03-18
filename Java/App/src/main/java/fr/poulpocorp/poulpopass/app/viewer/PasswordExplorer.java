@@ -35,30 +35,6 @@ public class PasswordExplorer extends JPanel {
 
             add(viewer);
             passwordMap.put(model, viewer);
-
-            /*model.addPasswordEditedListener(new PasswordEditedAdapter() {
-                @Override
-                public void passwordEdited(PasswordEvent event) {
-                    int type = event.getType();
-
-                    if ((type & PasswordEvent.NAME) != 0 || (type & PasswordEvent.ASSOCIATION) != 0) {
-                        for (Category category : password.getCategories()) {
-                            CategoryViewer categoryViewer = categoryMap.get(category);
-                            categoryViewer.updateViewer();
-                        }
-                    }
-                }
-
-                @Override
-                public void nameChanged(PasswordEvent event) {
-                    passwordEdited(event);
-                }
-
-                @Override
-                public void associationsChanged(PasswordEvent event) {
-                    passwordEdited(event);
-                }
-            });*/
         }
     }
 

@@ -1,14 +1,15 @@
 package fr.poulpocorp.poulpopass.app.model;
 
+import fr.poulpocorp.poulpopass.app.viewer.PasswordExplorer;
 import fr.poulpocorp.poulpopass.core.Category;
 import fr.poulpocorp.poulpopass.core.Password;
 
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static fr.poulpocorp.poulpopass.app.model.CategoryEvent.ASSOCIATION;
-import static fr.poulpocorp.poulpopass.app.model.CategoryEvent.NAME;
+import static fr.poulpocorp.poulpopass.app.model.CategoryEvent.*;
 
 public class CategoryModel extends Model {
 
@@ -16,6 +17,8 @@ public class CategoryModel extends Model {
     private final Category category;
 
     private final List<PasswordModel> passwords;
+
+    private ActionListener highlightListener;
 
     private boolean isEditing = false;
     private int type = 0;
@@ -38,15 +41,13 @@ public class CategoryModel extends Model {
             PasswordEvent e = new PasswordEvent(this);
 
             for (PasswordModel model : passwords) {
-                model.fireListener(PasswordEditedListener.class, (l) -> l.associationNameChanged(e));
+                model.fireAssociationsNameChanged();
             }
 
             if (isEditing) {
                 type |= NAME;
             } else {
-                CategoryEvent event = new CategoryEvent(this, NAME);
-
-                fireListener(CategoryEditedListener.class, (l) -> l.nameChanged(event));
+                fireNameChanged();
             }
 
             return true;
@@ -67,9 +68,7 @@ public class CategoryModel extends Model {
             if (isEditing) {
                 type |= ASSOCIATION;
             } else {
-                CategoryEvent event = new CategoryEvent(this, ASSOCIATION);
-
-                fireListener(CategoryEditedListener.class, (l) -> l.associationsChanged(event));
+                fireAssociationsChanged();
             }
 
             return true;
@@ -84,9 +83,7 @@ public class CategoryModel extends Model {
         if (isEditing) {
             type |= ASSOCIATION;
         } else {
-            CategoryEvent event = new CategoryEvent(this, ASSOCIATION);
-
-            fireListener(CategoryEditedListener.class, (l) -> l.associationsChanged(event));
+            fireAssociationsChanged();
         }
 
     }
@@ -94,14 +91,12 @@ public class CategoryModel extends Model {
     public boolean dissociateWith(PasswordModel password) {
         if (category.dissociateWith(password.getPasswordInstance())) {
             passwords.remove(password);
-            password.notifyAssociation(this);
+            password.notifyDissociation(this);
 
             if (isEditing) {
                 type |= ASSOCIATION;
             } else {
-                CategoryEvent event = new CategoryEvent(this, ASSOCIATION);
-
-                fireListener(CategoryEditedListener.class, (l) -> l.associationsChanged(event));
+                fireAssociationsChanged();
             }
 
             return true;
@@ -116,9 +111,7 @@ public class CategoryModel extends Model {
         if (isEditing) {
             type |= ASSOCIATION;
         } else {
-            CategoryEvent event = new CategoryEvent(this, ASSOCIATION);
-
-            fireListener(CategoryEditedListener.class, (l) -> l.associationsChanged(event));
+            fireAssociationsChanged();
         }
     }
 
@@ -144,19 +137,79 @@ public class CategoryModel extends Model {
 
     public boolean finishEdit() {
         if (isEditing) {
-            if (type > 0) {
-                CategoryEvent event = new CategoryEvent(this, type);
+            isEditing = false;
 
-                fireListener(CategoryEditedListener.class, (l) -> l.categoryEdited(event));
+            int old = type;
+            type = 0;
+
+            if (old > 0) {
+                fireCategoryEdited(old);
 
                 return true;
             }
-
-            type = 0;
-            isEditing = false;
         }
 
         return false;
+    }
+
+    protected void fireCategoryEdited(int type) {
+        CategoryEditedListener[] listeners = getCategoryEditedListeners();
+        if (listeners.length == 0) {
+            return;
+        }
+
+        CategoryEvent event = new CategoryEvent(this, type);
+        for (CategoryEditedListener listener : listeners) {
+            listener.categoryEdited(event);
+        }
+    }
+
+    protected void fireNameChanged() {
+        CategoryEditedListener[] listeners = getCategoryEditedListeners();
+        if (listeners.length == 0) {
+            return;
+        }
+
+        CategoryEvent event = new CategoryEvent(this, NAME);
+        for (CategoryEditedListener listener : listeners) {
+            listener.nameChanged(event);
+        }
+    }
+
+    protected void fireAssociationsChanged() {
+        CategoryEditedListener[] listeners = getCategoryEditedListeners();
+        if (listeners.length == 0) {
+            return;
+        }
+
+        CategoryEvent event = new CategoryEvent(this, ASSOCIATION);
+        for (CategoryEditedListener listener : listeners) {
+            listener.associationsChanged(event);
+        }
+    }
+
+    /**
+     * Used by the {@link PasswordModel} class
+     * @see CategoryEditedListener#associationNameChanged(CategoryEvent) for explanation
+     */
+    protected void fireAssociationsNameChanged() {
+        CategoryEditedListener[] listeners = getCategoryEditedListeners();
+        if (listeners.length == 0) {
+            return;
+        }
+
+        CategoryEvent event = new CategoryEvent(this, ASSOCIATION_NAME);
+        for (CategoryEditedListener listener : listeners) {
+            listener.associationNameChanged(event);
+        }
+    }
+
+    public ActionListener getOrCreateHighlightListener(PasswordExplorer explorer) {
+        if (highlightListener == null) {
+            highlightListener = e -> explorer.highlightCategory(this);
+        }
+
+        return highlightListener;
     }
 
     public void addCategoryEditedListener(CategoryEditedListener listener) {

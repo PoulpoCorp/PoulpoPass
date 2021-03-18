@@ -61,7 +61,7 @@ public class CategoryViewer extends AbstractViewer implements CategoryEditedList
         for (PasswordModel password : model.getPasswords()) {
             Tag tag = passwords.addTagToList(password.getName());
 
-            tag.addActionListener((e) -> explorer.highlightPassword(password));
+            tag.addActionListener(password.getOrCreateHighlightListener(explorer));
         }
 
         add(passwordsLabel, constraint);
@@ -102,13 +102,15 @@ public class CategoryViewer extends AbstractViewer implements CategoryEditedList
 
         if (models.size() > length) { // add
             for (; i < models.size(); i++) {
-                passwords.addTagToList(models.get(i).getName());
+                PasswordModel model = models.get(i);
+
+                Tag tag = passwords.addTagToList(model.getName());
+                tag.addActionListener(model.getOrCreateHighlightListener(explorer));
             }
         } else { // remove
             while (i < passwords.length()) {
                 passwords.removeTagInListAt(i);
             }
-
         }
 
         revalidate();

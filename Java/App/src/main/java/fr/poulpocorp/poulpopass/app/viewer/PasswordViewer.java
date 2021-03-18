@@ -117,7 +117,7 @@ public class PasswordViewer extends AbstractViewer implements PasswordEditedList
         for (CategoryModel category : model.getCategories()) {
             Tag tag = categories.addTagToList(category.getName());
 
-            tag.addActionListener((e) -> explorer.highlightCategory(category));
+            tag.addActionListener(category.getOrCreateHighlightListener(explorer));
         }
 
         constraint.fillXAxis = true;
@@ -214,7 +214,10 @@ public class PasswordViewer extends AbstractViewer implements PasswordEditedList
 
         if (models.size() > length) { // add
             for (; i < models.size(); i++) {
-                categories.addTagToList(models.get(i).getName());
+                CategoryModel model = models.get(i);
+
+                Tag tag = categories.addTagToList(models.get(i).getName());
+                tag.addActionListener(model.getOrCreateHighlightListener(explorer));
             }
         } else { // remove
             while (i < categories.length()) {

@@ -1,8 +1,10 @@
 package fr.poulpocorp.poulpopass.app.model;
 
+import fr.poulpocorp.poulpopass.app.viewer.PasswordExplorer;
 import fr.poulpocorp.poulpopass.core.Category;
 import fr.poulpocorp.poulpopass.core.Password;
 
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,6 +18,8 @@ public class PasswordModel extends Model {
     private final Password password;
 
     private final List<CategoryModel> categories;
+
+    private ActionListener highlightListener;
 
     private boolean isEditing = false;
     private int type = 0;
@@ -38,15 +42,13 @@ public class PasswordModel extends Model {
             CategoryEvent e = new CategoryEvent(this);
 
             for (CategoryModel model : categories) {
-                model.fireListener(CategoryEditedListener.class, (l) -> l.associationNameChanged(e));
+                model.fireAssociationsNameChanged();
             }
 
             if (isEditing) {
                 type |= NAME;
             } else {
-                PasswordEvent event = new PasswordEvent(this, NAME);
-
-                fireListener(PasswordEditedListener.class, (l) -> l.nameChanged(event));
+                fireNameChanged();
             }
 
             return true;
@@ -64,9 +66,7 @@ public class PasswordModel extends Model {
             if (isEditing) {
                 type |= PASSWORD;
             } else {
-                PasswordEvent event = new PasswordEvent(this, PASSWORD);
-
-                fireListener(PasswordEditedListener.class, (l) -> l.passwordChanged(event));
+                firePasswordChanged();
             }
 
             return true;
@@ -87,9 +87,7 @@ public class PasswordModel extends Model {
             if (isEditing) {
                 type |= ASSOCIATION;
             } else {
-                PasswordEvent event = new PasswordEvent(this, ASSOCIATION);
-
-                fireListener(PasswordEditedListener.class, (l) -> l.associationsChanged(event));
+                fireAssociationsChanged();
             }
 
             return true;
@@ -104,9 +102,7 @@ public class PasswordModel extends Model {
         if (isEditing) {
             type |= ASSOCIATION;
         } else {
-            PasswordEvent event = new PasswordEvent(this, ASSOCIATION);
-
-            fireListener(PasswordEditedListener.class, (l) -> l.associationsChanged(event));
+            fireAssociationsChanged();
         }
     }
 
@@ -118,9 +114,7 @@ public class PasswordModel extends Model {
             if (isEditing) {
                 type |= ASSOCIATION;
             } else {
-                PasswordEvent event = new PasswordEvent(this, ASSOCIATION);
-
-                fireListener(PasswordEditedListener.class, (l) -> l.associationsChanged(event));
+                fireAssociationsChanged();
             }
 
             return true;
@@ -135,9 +129,7 @@ public class PasswordModel extends Model {
         if (isEditing) {
             type |= ASSOCIATION;
         } else {
-            PasswordEvent event = new PasswordEvent(this, ASSOCIATION);
-
-            fireListener(PasswordEditedListener.class, (l) -> l.associationsChanged(event));
+            fireAssociationsChanged();
         }
     }
 
@@ -155,9 +147,7 @@ public class PasswordModel extends Model {
         if (isEditing) {
             type |= URLS;
         } else {
-            PasswordEvent event = new PasswordEvent(this, URLS);
-
-            fireListener(PasswordEditedListener.class, (l) -> l.urlsChanged(event));
+            fireUrlsChanged();
         }
     }
 
@@ -167,9 +157,7 @@ public class PasswordModel extends Model {
         if (isEditing) {
             type |= URLS;
         } else {
-            PasswordEvent event = new PasswordEvent(this, URLS);
-
-            fireListener(PasswordEditedListener.class, (l) -> l.urlsChanged(event));
+            fireUrlsChanged();
         }
     }
 
@@ -179,9 +167,7 @@ public class PasswordModel extends Model {
         if (isEditing) {
             type |= URLS;
         } else {
-            PasswordEvent event = new PasswordEvent(this, URLS);
-
-            fireListener(PasswordEditedListener.class, (l) -> l.urlsChanged(event));
+            fireUrlsChanged();
         }
     }
 
@@ -190,9 +176,7 @@ public class PasswordModel extends Model {
             if (isEditing) {
                 type |= URLS;
             } else {
-                PasswordEvent event = new PasswordEvent(this, URLS);
-
-                fireListener(PasswordEditedListener.class, (l) -> l.urlsChanged(event));
+                fireUrlsChanged();
             }
 
             return true;
@@ -207,9 +191,7 @@ public class PasswordModel extends Model {
         if (isEditing) {
             type |= URLS;
         } else {
-            PasswordEvent event = new PasswordEvent(this, URLS);
-
-            fireListener(PasswordEditedListener.class, (l) -> l.urlsChanged(event));
+            fireUrlsChanged();
         }
     }
 
@@ -219,9 +201,7 @@ public class PasswordModel extends Model {
         if (isEditing) {
             type |= URLS;
         } else {
-            PasswordEvent event = new PasswordEvent(this, URLS);
-
-            fireListener(PasswordEditedListener.class, (l) -> l.urlsChanged(event));
+            fireUrlsChanged();
         }
     }
 
@@ -231,9 +211,7 @@ public class PasswordModel extends Model {
         if (isEditing) {
             type |= URLS;
         } else {
-            PasswordEvent event = new PasswordEvent(this, URLS);
-
-            fireListener(PasswordEditedListener.class, (l) -> l.urlsChanged(event));
+            fireUrlsChanged();
         }
     }
 
@@ -243,9 +221,7 @@ public class PasswordModel extends Model {
         if (isEditing) {
             type |= URLS;
         } else {
-            PasswordEvent event = new PasswordEvent(this, URLS);
-
-            fireListener(PasswordEditedListener.class, (l) -> l.urlsChanged(event));
+            fireUrlsChanged();
         }
     }
 
@@ -255,9 +231,7 @@ public class PasswordModel extends Model {
         if (isEditing) {
             type |= URLS;
         } else {
-            PasswordEvent event = new PasswordEvent(this, URLS);
-
-            fireListener(PasswordEditedListener.class, (l) -> l.urlsChanged(event));
+            fireUrlsChanged();
         }
     }
 
@@ -283,19 +257,103 @@ public class PasswordModel extends Model {
 
     public boolean finishEdit() {
         if (isEditing) {
-            if (type > 0) {
-                PasswordEvent event = new PasswordEvent(this, type);
+            isEditing = false;
 
-                fireListener(PasswordEditedListener.class, (l) -> l.passwordEdited(event));
+            int old = type;
+            type = 0;
+
+            if (old > 0) {
+                firePasswordEdited(old);
 
                 return true;
             }
-
-            type = 0;
-            isEditing = false;
         }
 
         return false;
+    }
+
+    protected void firePasswordEdited(int type) {
+        PasswordEditedListener[] listeners = getPasswordEditedListeners();
+        if (listeners.length == 0) {
+            return;
+        }
+
+        PasswordEvent event = new PasswordEvent(this, type);
+        for (PasswordEditedListener listener : listeners) {
+            listener.passwordEdited(event);
+        }
+    }
+
+    protected void fireNameChanged() {
+        PasswordEditedListener[] listeners = getPasswordEditedListeners();
+        if (listeners.length == 0) {
+            return;
+        }
+
+        PasswordEvent event = new PasswordEvent(this, NAME);
+        for (PasswordEditedListener listener : listeners) {
+            listener.nameChanged(event);
+        }
+    }
+
+    protected void firePasswordChanged() {
+        PasswordEditedListener[] listeners = getPasswordEditedListeners();
+        if (listeners.length == 0) {
+            return;
+        }
+
+        PasswordEvent event = new PasswordEvent(this, PASSWORD);
+        for (PasswordEditedListener listener : listeners) {
+            listener.passwordChanged(event);
+        }
+    }
+
+    protected void fireUrlsChanged() {
+        PasswordEditedListener[] listeners = getPasswordEditedListeners();
+        if (listeners.length == 0) {
+            return;
+        }
+
+        PasswordEvent event = new PasswordEvent(this, URLS);
+        for (PasswordEditedListener listener : listeners) {
+            listener.urlsChanged(event);
+        }
+    }
+
+    protected void fireAssociationsChanged() {
+        PasswordEditedListener[] listeners = getPasswordEditedListeners();
+        if (listeners.length == 0) {
+            return;
+        }
+
+        PasswordEvent event = new PasswordEvent(this, ASSOCIATION);
+        for (PasswordEditedListener listener : listeners) {
+            listener.associationsChanged(event);
+        }
+    }
+
+    /**
+     * Used by the {@link CategoryModel} class
+     * @see PasswordEditedListener#associationNameChanged(PasswordEvent) for explanation
+     */
+    protected void fireAssociationsNameChanged() {
+        PasswordEditedListener[] listeners = getPasswordEditedListeners();
+        if (listeners.length == 0) {
+            return;
+        }
+
+        PasswordEvent event = new PasswordEvent(this, ASSOCIATION_NAME);
+        for (PasswordEditedListener listener : listeners) {
+            listener.associationNameChanged(event);
+        }
+    }
+
+    public ActionListener getOrCreateHighlightListener(PasswordExplorer explorer) {
+        if (highlightListener == null) {
+            highlightListener = e -> explorer.highlightPassword(this);
+        }
+
+        return highlightListener;
     }
 
     public void addPasswordEditedListener(PasswordEditedListener listener) {
