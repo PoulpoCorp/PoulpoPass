@@ -19,4 +19,8 @@ public class Icons {
     public static final FlatSVGIcon ADD = new FlatSVGIcon("add_icon.svg");
 
     public static final FlatSVGIcon REMOVE = new FlatSVGIcon("remove_icon.svg");
+
+    public static final FlatSVGIcon ERROR = new FlatSVGIcon("error_icon.svg");
+
+    public static final FlatSVGIcon WARNING = new FlatSVGIcon("warning_icon.svg");
 }

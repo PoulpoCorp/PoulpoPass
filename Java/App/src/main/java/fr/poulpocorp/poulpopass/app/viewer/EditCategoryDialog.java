@@ -1,6 +1,5 @@
 package fr.poulpocorp.poulpopass.app.viewer;
 
-import com.formdev.flatlaf.FlatClientProperties;
 import fr.poulpocorp.poulpopass.app.layout.VerticalConstraint;
 import fr.poulpocorp.poulpopass.app.model.CategoryModel;
 import fr.poulpocorp.poulpopass.app.model.PasswordManagerModel;
@@ -61,8 +60,7 @@ public class EditCategoryDialog extends AbstractEditDialog<CategoryModel> {
         boolean categoryNameChanged = !nameField.getText().equals(model.getName());
 
         if (categoryNameChanged && manager.containsCategoryWithName(nameField.getText())) {
-            // no
-            nameField.putClientProperty(FlatClientProperties.OUTLINE, FlatClientProperties.OUTLINE_ERROR);
+            nameField.error("A category with this name already exist");
             repaint();
         } else {
             model.edit();

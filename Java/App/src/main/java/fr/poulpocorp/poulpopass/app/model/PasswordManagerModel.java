@@ -10,8 +10,6 @@ import java.security.InvalidKeyException;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
-import static fr.poulpocorp.poulpopass.app.model.CategoryEvent.ASSOCIATION_NAME;
-
 public class PasswordManagerModel extends Model {
 
     private final PasswordManager manager;

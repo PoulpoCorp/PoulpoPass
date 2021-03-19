@@ -165,8 +165,7 @@ public class EditPasswordDialog extends AbstractEditDialog<PasswordModel> {
         boolean passwordNameChanged = !nameField.getText().equals(model.getName());
 
         if (passwordNameChanged && manager.containsPasswordWithName(nameField.getText())) {
-            // no
-            nameField.putClientProperty(FlatClientProperties.OUTLINE, FlatClientProperties.OUTLINE_ERROR);
+            nameField.error("A password with this name already exist");
             repaint();
         } else {
             model.edit();

@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatClientProperties;
 import fr.poulpocorp.poulpopass.app.layout.*;
 import fr.poulpocorp.poulpopass.app.model.Model;
 import fr.poulpocorp.poulpopass.app.tag.JTagComponent;
+import fr.poulpocorp.poulpopass.app.text.ErrorTextField;
 import fr.poulpocorp.poulpopass.app.utils.Icons;
 import fr.poulpocorp.poulpopass.app.utils.Utils;
 
@@ -18,7 +19,7 @@ public abstract class AbstractEditDialog<MODEL extends Model> extends JDialog {
     protected JScrollPane scrollPane;
     protected JPanel content;
 
-    protected JTextField nameField;
+    protected ErrorTextField nameField;
     protected JTagComponent associations;
 
     protected JPanel bottomPanel;
@@ -60,7 +61,7 @@ public abstract class AbstractEditDialog<MODEL extends Model> extends JDialog {
 
         content = new JPanel();
         content.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        content.setLayout(new VerticalLayout(5, 5));
+        content.setLayout(new VerticalLayout(2, 2));
 
         // Name
         JLabel nameLabel = new JLabel("Name");
@@ -68,7 +69,7 @@ public abstract class AbstractEditDialog<MODEL extends Model> extends JDialog {
 
         nameLabel.setForeground(titleLabelColor);
 
-        nameField = new JTextField(getModelName());
+        nameField = new ErrorTextField(getModelName());
 
         // Bottom panel
         bottomPanel = new JPanel();

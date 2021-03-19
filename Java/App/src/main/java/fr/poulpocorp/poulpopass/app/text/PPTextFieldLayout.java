@@ -37,16 +37,6 @@ public class PPTextFieldLayout implements LayoutManager2 {
         return null;
     }
 
-    private Dimension getDimOf(Component c, boolean preferred) {
-        if (c == null) {
-            return new Dimension();
-        } else if (preferred) {
-            return c.getPreferredSize();
-        } else {
-            return c.getMinimumSize();
-        }
-    }
-
     @Override
     public void layoutContainer(Container parent) {
         if (!(parent instanceof IPPTextField)) {

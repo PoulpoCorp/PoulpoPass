@@ -13,22 +13,19 @@ public class PPTextField extends JTextField implements IPPTextField {
     private Component leadingComponent;
 
     public PPTextField() {
-        setLayout(new PPTextFieldLayout());
+        this(null, null, 0);
     }
 
     public PPTextField(String text) {
-        super(text);
-        setLayout(new PPTextFieldLayout());
+        this(null, text, 0);
     }
 
     public PPTextField(int columns) {
-        super(columns);
-        setLayout(new PPTextFieldLayout());
+        this(null, null, columns);
     }
 
     public PPTextField(String text, int columns) {
-        super(text, columns);
-        setLayout(new PPTextFieldLayout());
+        this(null, text, columns);
     }
 
     public PPTextField(Document doc, String text, int columns) {

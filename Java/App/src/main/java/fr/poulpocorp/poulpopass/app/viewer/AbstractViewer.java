@@ -24,7 +24,7 @@ public abstract class AbstractViewer extends JComponent {
     }
 
     protected void initComponents() {
-        setLayout(new VerticalLayout(5, 5));
+        setLayout(new VerticalLayout(4, 4));
 
         VerticalConstraint constraint = new VerticalConstraint();
         constraint.fillXAxis = true;
